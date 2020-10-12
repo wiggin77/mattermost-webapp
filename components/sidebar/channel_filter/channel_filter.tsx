@@ -6,11 +6,12 @@ import {Tooltip} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
 import classNames from 'classnames';
 
-import {trackEvent} from 'actions/diagnostics_actions';
+import {trackEvent} from 'actions/telemetry_actions';
 import OverlayTrigger from 'components/overlay_trigger';
 import {localizeMessage} from 'utils/utils';
 
 type Props = {
+    hasMultipleTeams: boolean;
     unreadFilterEnabled: boolean;
     actions: {
         setUnreadFilterEnabled: (enabled: boolean) => void;
@@ -35,7 +36,7 @@ export default class ChannelFilter extends React.PureComponent<Props, State> {
     }
 
     render() {
-        const {unreadFilterEnabled} = this.props;
+        const {unreadFilterEnabled, hasMultipleTeams} = this.props;
 
         let filterTitle = (
             <FormattedMessage
@@ -92,7 +93,7 @@ export default class ChannelFilter extends React.PureComponent<Props, State> {
                 >
                     <OverlayTrigger
                         delayShow={500}
-                        placement='top'
+                        placement={hasMultipleTeams ? 'top' : 'right'}
                         overlay={tooltip}
                     >
                         <i className='icon icon-filter-variant'/>

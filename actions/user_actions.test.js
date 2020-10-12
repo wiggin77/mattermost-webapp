@@ -11,6 +11,7 @@ import {CategoryTypes} from 'mattermost-redux/constants/channel_categories';
 import * as UserActions from 'actions/user_actions';
 import {getState} from 'stores/redux_store';
 import TestHelper from 'tests/helpers/client-test-helper';
+import {trackEvent} from 'actions/telemetry_actions.jsx';
 
 const mockStore = configureStore([thunk]);
 
@@ -18,7 +19,7 @@ const mockChannelsObj1 = [{id: 'gmChannel1', type: General.GM_CHANNEL}];
 const mockChannelsObj2 = [{id: 'gmChannel', type: General.GM_CHANNEL}];
 
 jest.mock('mattermost-redux/actions/users', () => {
-    const original = require.requireActual('mattermost-redux/actions/users');
+    const original = jest.requireActual('mattermost-redux/actions/users');
     return {
         ...original,
         searchProfiles: (...args) => ({type: 'MOCK_SEARCH_PROFILES', args}),
@@ -29,12 +30,24 @@ jest.mock('mattermost-redux/actions/users', () => {
     };
 });
 
+jest.mock('mattermost-redux/selectors/entities/channels', () => {
+    const GeneralTypes = jest.requireActual('mattermost-redux/constants').General;
+    const original = jest.requireActual('mattermost-redux/selectors/entities/channels');
+    const mockDmGmUsersInLhs = [{id: 'gmChannel', type: GeneralTypes.GM_CHANNEL}, {id: 'dmChannel', type: GeneralTypes.DM_CHANNEL}];
+
+    return {
+        ...original,
+        getDirectChannels: jest.fn().mockReturnValue(mockDmGmUsersInLhs),
+    };
+});
+
 jest.mock('mattermost-redux/selectors/entities/channel_categories', () => {
-    const GeneralTypes = require.requireActual('mattermost-redux/constants').General;
-    const original = require.requireActual('mattermost-redux/selectors/entities/channel_categories');
+    const GeneralTypes = jest.requireActual('mattermost-redux/constants').General;
+    const original = jest.requireActual('mattermost-redux/selectors/entities/channel_categories');
 
     const mockChannelsObj = [{id: 'gmChannel', type: GeneralTypes.GM_CHANNEL}];
     const mockFunc = jest.fn();
+
     return {
         ...original,
         makeFilterAutoclosedDMs: jest.fn().mockReturnValue(mockFunc),
@@ -43,7 +56,7 @@ jest.mock('mattermost-redux/selectors/entities/channel_categories', () => {
 });
 
 jest.mock('mattermost-redux/actions/teams', () => {
-    const original = require.requireActual('mattermost-redux/actions/teams');
+    const original = jest.requireActual('mattermost-redux/actions/teams');
     return {
         ...original,
         getTeamMembersByIds: (...args) => ({type: 'MOCK_GET_TEAM_MEMBERS_BY_IDS', args}),
@@ -51,7 +64,7 @@ jest.mock('mattermost-redux/actions/teams', () => {
 });
 
 jest.mock('mattermost-redux/actions/channels', () => {
-    const original = require.requireActual('mattermost-redux/actions/channels');
+    const original = jest.requireActual('mattermost-redux/actions/channels');
     return {
         ...original,
         getChannelMembersByIds: (...args) => ({type: 'MOCK_GET_CHANNEL_MEMBERS_BY_IDS', args}),
@@ -59,7 +72,7 @@ jest.mock('mattermost-redux/actions/channels', () => {
 });
 
 jest.mock('mattermost-redux/actions/preferences', () => {
-    const original = require.requireActual('mattermost-redux/actions/preferences');
+    const original = jest.requireActual('mattermost-redux/actions/preferences');
     return {
         ...original,
         deletePreferences: (...args) => ({type: 'MOCK_DELETE_PREFERENCES', args}),
@@ -71,6 +84,14 @@ jest.mock('stores/redux_store', () => {
     return {
         dispatch: jest.fn(),
         getState: jest.fn(),
+    };
+});
+
+jest.mock('actions/telemetry_actions.jsx', () => {
+    const original = jest.requireActual('actions/telemetry_actions.jsx');
+    return {
+        ...original,
+        trackEvent: jest.fn(),
     };
 });
 
@@ -151,9 +172,9 @@ describe('Actions.User', () => {
 
     test('loadProfilesAndStatusesInChannel', async () => {
         const testStore = await mockStore(initialState);
-        await testStore.dispatch(UserActions.loadProfilesAndStatusesInChannel('channel_1', 0, 60, 'status'));
+        await testStore.dispatch(UserActions.loadProfilesAndStatusesInChannel('channel_1', 0, 60, 'status', {}));
         const actualActions = testStore.getActions();
-        expect(actualActions[0].args).toEqual(['channel_1', 0, 60, 'status']);
+        expect(actualActions[0].args).toEqual(['channel_1', 0, 60, 'status', {}]);
         expect(actualActions[0].type).toEqual('MOCK_GET_PROFILES_IN_CHANNEL');
         expect(actualActions[1].args).toEqual([['user_1']]);
         expect(actualActions[1].type).toEqual('MOCK_GET_STATUSES_BY_ID');
@@ -186,7 +207,7 @@ describe('Actions.User', () => {
     });
 
     test('loadProfilesAndTeamMembersAndChannelMembers', async () => {
-        const expectedActions = [{type: 'MOCK_GET_PROFILES_IN_CHANNEL', args: ['current_channel_id', 0, 60]}];
+        const expectedActions = [{type: 'MOCK_GET_PROFILES_IN_CHANNEL', args: ['current_channel_id', 0, 60, '', undefined]}];
 
         let testStore = await mockStore(initialState);
         await testStore.dispatch(UserActions.loadProfilesAndTeamMembersAndChannelMembers(0, 60, 'team_1', 'current_channel_id'));
@@ -348,5 +369,11 @@ describe('Actions.User', () => {
         await UserActions.loadProfilesForGM();
         expect(UserActions.queue.onEmpty).toHaveBeenCalled();
         expect(UserActions.queue.add).toHaveBeenCalled();
+    });
+
+    test('trackDMGMOpenChannels', async () => {
+        const testStore = await mockStore(initialState);
+        await testStore.dispatch(UserActions.trackDMGMOpenChannels());
+        expect(trackEvent).toHaveBeenCalledWith('ui', 'LHS_DM_GM_Count', {count: 2});
     });
 });

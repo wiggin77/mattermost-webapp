@@ -1,10 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {FormattedMessage} from 'react-intl';
 
 export default class SettingsUpload extends React.PureComponent {
@@ -22,10 +20,12 @@ export default class SettingsUpload extends React.PureComponent {
 
     doFileSelect = (e) => {
         e.preventDefault();
-        var filename = $(e.target).val();
+
+        let filename = e.target.value;
         if (filename.substring(3, 11) === 'fakepath') {
             filename = filename.substring(12);
         }
+
         this.setState({
             clientError: '',
             serverError: '',
@@ -40,7 +40,9 @@ export default class SettingsUpload extends React.PureComponent {
 
     doSubmit = (e) => {
         e.preventDefault();
-        var inputnode = ReactDOM.findDOMNode(this.uploadinput.current);
+
+        const inputnode = this.uploadinput.current;
+
         if (inputnode.files && inputnode.files[0]) {
             this.props.submit(inputnode.files[0]);
         } else {

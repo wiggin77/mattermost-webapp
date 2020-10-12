@@ -18,9 +18,9 @@ import HeaderIconWrapper from 'components/channel_header/components/header_icon_
 import SearchHint from 'components/search_hint/search_hint';
 import FlagIcon from 'components/widgets/icons/flag_icon';
 import MentionsIcon from 'components/widgets/icons/mentions_icon';
-import SearchIcon from 'components/widgets/icons/search_icon';
 import LoadingSpinner from 'components/widgets/loading/loading_spinner';
 import Popover from 'components/widgets/popover';
+import UserGuideDropdown from 'components/channel_header/components/user_guide_dropdown';
 
 const {KeyCodes} = Constants;
 
@@ -175,7 +175,6 @@ export default class SearchBar extends React.PureComponent {
             this.props.actions.updateRhsState(RHSStates.SEARCH);
         }
         this.props.actions.updateSearchTerms('');
-        this.setState({termsUsed: 0});
     }
 
     handleUserFocus = () => {
@@ -236,7 +235,7 @@ export default class SearchBar extends React.PureComponent {
         pretextArray.push(term.toLowerCase());
         this.props.actions.updateSearchTerms(pretextArray.join(' '));
         this.focus();
-        this.setState({highlightedSearchHintIndex: -1, indexChangedViaKeyPress: false, termsUsed: this.state.termsUsed + 1});
+        this.setState({highlightedSearchHintIndex: -1, indexChangedViaKeyPress: false});
     }
 
     focus = () => {
@@ -272,17 +271,21 @@ export default class SearchBar extends React.PureComponent {
 
         let termsUsed = 0;
         this.props.searchTerms.split(/[: ]/g).forEach((word) => {
-            if (searchHintOptions.some(({searchTerm}) => searchTerm.toLowerCase() === `${word.toLowerCase()}:`)) {
+            if (searchHintOptions.some(({searchTerm}) => searchTerm.toLowerCase() === word.toLowerCase())) {
                 termsUsed++;
             }
         });
+        if (visibleSearchHintOptions.length > 0 && !this.props.isMentionSearch) {
+            let helpClass = 'search-help-popover';
+            if (this.state.focused && termsUsed <= 2) {
+                helpClass += ' visible';
+            }
 
-        if (visibleSearchHintOptions.length > 0 && !this.props.isMentionSearch && termsUsed <= 1 && this.state.focused) {
             return (
                 <Popover
                     id={this.props.isSideBarRight ? 'sbr-searchbar-help-popup' : 'searchbar-help-popup'}
                     placement='bottom'
-                    className='search-help-popover visible'
+                    className={helpClass}
                 >
                     <SearchHint
                         options={visibleSearchHintOptions}
@@ -309,6 +312,7 @@ export default class SearchBar extends React.PureComponent {
     render() {
         let mentionBtn;
         let flagBtn;
+        let userGuideBtn;
         if (this.props.showMentionFlagBtns) {
             mentionBtn = (
                 <HeaderIconWrapper
@@ -344,6 +348,8 @@ export default class SearchBar extends React.PureComponent {
                     isRhsOpen={this.props.isRhsOpen}
                 />
             );
+
+            userGuideBtn = (<UserGuideDropdown/>);
         }
 
         let searchFormClass = 'search__form';
@@ -384,10 +390,9 @@ export default class SearchBar extends React.PureComponent {
                         autoComplete='off'
                         aria-labelledby='searchBox'
                     >
-                        <SearchIcon
-                            className='search__icon'
-                            aria-hidden='true'
-                        />
+                        <div className='search__font-icon'>
+                            <i className='icon icon-magnify icon-16'/>
+                        </div>
                         <SuggestionBox
                             ref={this.getSearch}
                             id={this.props.isSideBarRight ? 'sbrSearchBox' : 'searchBox'}
@@ -419,6 +424,7 @@ export default class SearchBar extends React.PureComponent {
                 </div>
                 {mentionBtn}
                 {flagBtn}
+                {userGuideBtn}
             </div>
         );
     }

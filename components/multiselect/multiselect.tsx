@@ -5,7 +5,7 @@ import React from 'react';
 import {FormattedMessage} from 'react-intl';
 import ReactSelect from 'react-select';
 
-import {ActionMeta} from 'react-select/src/types';
+import {InputActionMeta} from 'react-select/src/types';
 import {getOptionValue} from 'react-select/src/builtins';
 
 import {Constants, A11yCustomEventTypes} from 'utils/constants';
@@ -41,6 +41,7 @@ export type Props<T extends Value> = {
         onAdd: (value: T) => void,
         onMouseMove: (value: T) => void
     ) => void;
+    selectedItemRef?: React.RefObject<HTMLDivElement>;
     options: T[];
     perPage: number;
     placeholderText?: string;
@@ -161,7 +162,6 @@ export default class MultiSelect<T extends Value> extends React.PureComponent<Pr
             this.reactSelectRef.current.select.handleInputChange(
                 {currentTarget: {value: ''}} as React.KeyboardEvent<HTMLInputElement>,
             );
-            this.onInput('');
             this.reactSelectRef.current.focus();
         }
 
@@ -171,7 +171,7 @@ export default class MultiSelect<T extends Value> extends React.PureComponent<Pr
         }
     }
 
-    private onInput = (input: string, change: ActionMeta | { action: string } = {action: ''}) => {
+    private onInput = (input: string, change: InputActionMeta) => {
         if (!change) {
             return;
         }
@@ -398,11 +398,17 @@ export default class MultiSelect<T extends Value> extends React.PureComponent<Pr
                             savingMessage={this.props.buttonSubmitLoadingText}
                         />
                     </div>
-                    <div className='multi-select__help'>
+                    <div
+                        id='multiSelectHelpMemberInfo'
+                        className='multi-select__help'
+                    >
                         {numRemainingText}
                         {memberCount}
                     </div>
-                    <div className='multi-select__help'>
+                    <div
+                        id='multiSelectMessageNote'
+                        className='multi-select__help'
+                    >
                         {noteTextContainer}
                     </div>
                 </div>
@@ -417,6 +423,7 @@ export default class MultiSelect<T extends Value> extends React.PureComponent<Pr
                     onAdd={this.onAdd}
                     onSelect={this.onSelect}
                     loading={this.props.loading}
+                    selectedItemRef={this.props.selectedItemRef}
                 />
                 <div className='filter-controls'>
                     {previousButton}

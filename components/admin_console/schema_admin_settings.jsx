@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+/* eslint-disable react/no-string-refs */
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -47,6 +48,8 @@ export default class SchemaAdminSettings extends React.PureComponent {
         license: PropTypes.object,
         editRole: PropTypes.func,
         updateConfig: PropTypes.func.isRequired,
+        isDisabled: PropTypes.bool,
+        consoleAccess: PropTypes.object,
     }
 
     constructor(props) {
@@ -345,8 +348,9 @@ export default class SchemaAdminSettings extends React.PureComponent {
     }
 
     isDisabled = (setting) => {
+        const enterpriseReady = this.props.config.BuildEnterpriseReady === 'true';
         if (typeof setting.isDisabled === 'function') {
-            return setting.isDisabled(this.props.config, this.state, this.props.license);
+            return setting.isDisabled(this.props.config, this.state, this.props.license, enterpriseReady, this.props.consoleAccess);
         }
         return Boolean(setting.isDisabled);
     }
@@ -464,7 +468,7 @@ export default class SchemaAdminSettings extends React.PureComponent {
                 id={setting.key}
                 label={this.renderLabel(setting)}
                 helpText={this.renderHelpText(setting)}
-                value={(!this.isDisabled(setting) && this.state[setting.key]) || false}
+                value={this.state[setting.key] || false}
                 disabled={this.isDisabled(setting)}
                 setByEnv={this.isSetByEnv(setting.key)}
                 onChange={this.handleChange}
@@ -479,7 +483,7 @@ export default class SchemaAdminSettings extends React.PureComponent {
                 id={setting.key}
                 label={this.renderLabel(setting)}
                 helpText={this.renderHelpText(setting)}
-                value={(!this.isDisabled(setting) && this.state[setting.key]) || false}
+                value={this.state[setting.key] || false}
                 disabled={this.isDisabled(setting)}
                 setByEnv={this.isSetByEnv(setting.key)}
                 onChange={this.handlePermissionChange}
@@ -535,12 +539,7 @@ export default class SchemaAdminSettings extends React.PureComponent {
                     defaultMessage={setting.no_result_default}
                 />
             );
-            const notPresent = (
-                <FormattedMessage
-                    id={setting.not_present}
-                    defaultMessage={setting.not_present_default}
-                />
-            );
+
             return (
                 <MultiSelectSetting
                     key={this.props.schema.id + '_language_' + setting.key}
@@ -553,7 +552,6 @@ export default class SchemaAdminSettings extends React.PureComponent {
                     setByEnv={this.isSetByEnv(setting.key)}
                     onChange={(changedId, value) => this.handleChange(changedId, value.join(','))}
                     noResultText={noResultText}
-                    notPresent={notPresent}
                 />
             );
         }
@@ -984,7 +982,10 @@ export default class SchemaAdminSettings extends React.PureComponent {
         if (schema && schema.component && schema.settings) {
             const CustomComponent = schema.component;
             return (
-                <CustomComponent {...this.props}/>
+                <CustomComponent
+                    {...this.props}
+                    disabled={this.props.isDisabled}
+                />
             );
         }
         return null;
@@ -995,7 +996,10 @@ export default class SchemaAdminSettings extends React.PureComponent {
         if (schema && schema.component && !schema.settings) {
             const CustomComponent = schema.component;
             return (
-                <CustomComponent {...this.props}/>
+                <CustomComponent
+                    {...this.props}
+                    disabled={this.props.isDisabled}
+                />
             );
         }
 
@@ -1054,6 +1058,7 @@ export default class SchemaAdminSettings extends React.PureComponent {
                     />
                     <div
                         className='error-message'
+                        data-testid='errorMessage'
                         ref='errorMessage'
                         onMouseOver={this.openTooltip}
                         onMouseOut={this.closeTooltip}
@@ -1081,3 +1086,4 @@ export default class SchemaAdminSettings extends React.PureComponent {
         );
     }
 }
+/* eslint-disable react/no-string-refs */

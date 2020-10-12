@@ -31,10 +31,17 @@
         }
     }
 
+    .icon.icon__flag {
+        svg {
+            height: 18px;
+            width: 18px;
+        }
+    }
+
     &:active,
     &--active,
     &--active:hover {
-        background: v(button-bg-08);
+        background: rgba(var(--button-bg-rgb), 0.08);
         fill: v(button-bg);
         color: v(button-bg);
     }
@@ -52,4 +59,8 @@
 .channel-header__icon--wide {
     width: auto;
     padding: 0 6px;
+}
+
+.userGuideHelp {
+    display: inline-table;
 }

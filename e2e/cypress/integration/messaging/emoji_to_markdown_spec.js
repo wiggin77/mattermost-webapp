@@ -7,49 +7,20 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
-// Stage: @prod @smoke
+// Stage: @prod
 // Group: @messaging
 
-function createMessages(message, aliases) {
-    cy.postMessage(message);
-    cy.getLastPostId().then((postId) => {
-        cy.get(`#postMessageText_${postId}`).as(aliases[0]);
-        cy.clickPostCommentIcon(postId);
-    });
-
-    cy.postMessageReplyInRHS(message + '{enter}');
-    cy.getLastPostId().then((postId) => {
-        cy.get(`#postMessageText_${postId}`).as(aliases[1]);
-    });
-}
-
-function createAndVerifyMessage(message, isCode) {
-    const aliases = ['newLineMessage', 'aliasLineMessageReplyInRHS'];
-    createMessages(message, aliases);
-
-    if (isCode) {
-        aliases.forEach((alias) => {
-            cy.get('@' + alias).
-                children().should('have.class', 'post-code').
-                children('code').should('be.visible').contains(message.trim());
-        });
-    } else {
-        aliases.forEach((alias) => {
-            cy.get('@' + alias).
-                children().should('have.class', 'all-emoji').
-                children().find('span').last().should('have.class', 'emoticon').
-                and('have.attr', 'title', message.trim() === ':D' ? ':smile:' : ':taco:');
-        });
-    }
-}
+import * as TIMEOUTS from '../../fixtures/timeouts';
 
 describe('Messaging', () => {
     before(() => {
-        cy.apiLogin('user-1');
-        cy.visit('/ad-1/channels/town-square');
+        // # Login as test user and visit town-square
+        cy.apiInitSetup({loginAfter: true}).then(({team}) => {
+            cy.visit(`/${team.name}/channels/town-square`);
+        });
     });
 
-    it('M17446 - Emojis preceded by 4 or more spaces are treated as Markdown', () => {
+    it('MM-T198 Emojis preceeded by 4 or more spaces are always treated as markdown', () => {
         [
             '    :taco:',
             '     :taco:',
@@ -67,3 +38,38 @@ describe('Messaging', () => {
         });
     });
 });
+
+function createMessages(message, aliases) {
+    cy.postMessage(message);
+    cy.getLastPostId().then((postId) => {
+        cy.get(`#postMessageText_${postId}`).as(aliases[0]);
+        cy.clickPostCommentIcon(postId);
+        cy.wait(TIMEOUTS.HALF_SEC);
+    });
+
+    cy.postMessageReplyInRHS(message);
+    cy.getLastPostId().then((postId) => {
+        cy.get(`#postMessageText_${postId}`).as(aliases[1]);
+    });
+}
+
+function createAndVerifyMessage(message, isCode) {
+    const aliases = ['newLineMessage', 'aliasLineMessageReplyInRHS'];
+    createMessages(message, aliases);
+
+    if (isCode) {
+        aliases.forEach((alias) => {
+            cy.get('@' + alias).
+                find('.post-code').should('be.visible').
+                find('code').should('be.visible').
+                contains(message.trim());
+        });
+    } else {
+        aliases.forEach((alias) => {
+            cy.get('@' + alias).
+                children().should('have.class', 'all-emoji').
+                children().find('span').last().should('have.class', 'emoticon').
+                and('have.attr', 'title', message.trim() === ':D' ? ':smile:' : ':taco:');
+        });
+    }
+}

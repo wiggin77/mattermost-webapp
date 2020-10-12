@@ -16,15 +16,14 @@ describe('Group Synced Team - Bot invitation flow', () => {
 
     before(() => {
         // * Check if server has license for LDAP Groups
-        cy.requireLicenseForFeature('LDAPGroups');
+        cy.apiRequireLicenseForFeature('LDAPGroups');
 
-        // # Login as sysadmin and enable LDAP
-        cy.apiLogin('sysadmin');
+        // # Enable LDAP
         cy.apiUpdateConfig({LdapSettings: {Enable: true}});
 
         // # Get the first group constrained team available on the server
-        cy.apiGetAllTeams().then((response) => {
-            response.body.forEach((team) => {
+        cy.apiGetAllTeams().then(({teams}) => {
+            teams.forEach((team) => {
                 if (team.group_constrained && !groupConstrainedTeam) {
                     groupConstrainedTeam = team;
                 }
@@ -32,19 +31,19 @@ describe('Group Synced Team - Bot invitation flow', () => {
         });
 
         // # Get the first bot on the server
-        cy.apiGetBots().then((response) => {
-            bot = response.body[0];
+        cy.apiGetBots().then(({bots}) => {
+            bot = bots[0];
         });
     });
 
-    it('MM-21793 Invite and remove a bot within a group synced team', async () => {
+    it('MM-21793 Invite and remove a bot within a group synced team', () => {
         if (!groupConstrainedTeam || !bot) {
             return;
         }
 
         // # Logout sysadmin and login as an LDAP Group synced user
         cy.apiLogout();
-        cy.apiLogin('test.one', 'Password1');
+        cy.apiLogin({username: 'test.one', password: 'Password1'});
 
         // # Visit the group constrained team
         cy.visit(`/${groupConstrainedTeam.name}`);
@@ -69,7 +68,7 @@ describe('Group Synced Team - Bot invitation flow', () => {
         // # Invite the bot
         cy.get('#inviteMembersButton').click();
 
-        // * Ensure that the response messsage was not an error
+        // * Ensure that the response message was not an error
         cy.get('.InvitationModalConfirmStepRow').find('.reason').should('not.contain', 'Error');
 
         // # Visit the group constrained team

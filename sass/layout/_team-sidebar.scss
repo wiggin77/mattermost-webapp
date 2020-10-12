@@ -6,10 +6,14 @@
     position: fixed;
     text-align: center;
     width: 65px;
-    z-index: 13;
+    z-index: 17;
 
     body.announcement-bar--fixed & {
         height: calc(100% - #{$announcement-bar-height});
+    }
+
+    body.announcement-banner-tall--fixed & {
+        height: calc(100% - 40px);
     }
 
     .fa {

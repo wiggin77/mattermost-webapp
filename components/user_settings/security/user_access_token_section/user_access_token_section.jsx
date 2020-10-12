@@ -1,12 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+/* eslint-disable react/no-string-refs */
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {FormattedHTMLMessage, FormattedMessage} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 import * as UserUtils from 'mattermost-redux/utils/user_utils';
 
-import {trackEvent} from 'actions/diagnostics_actions.jsx';
+import {trackEvent} from 'actions/telemetry_actions.jsx';
 import Constants from 'utils/constants';
 import {isMobile} from 'utils/user_agent';
 import * as Utils from 'utils/utils.jsx';
@@ -122,7 +123,7 @@ export default class UserAccessTokenSection extends React.PureComponent {
             ),
             confirmMessage: (state) => (
                 <div>
-                    <FormattedHTMLMessage
+                    <FormattedMessage
                         id='user.settings.tokens.confirmCopyMessage'
                         defaultMessage="Make sure you have copied and saved the access token below. You won't be able to see it again!"
                     />
@@ -193,7 +194,7 @@ export default class UserAccessTokenSection extends React.PureComponent {
             ),
             confirmMessage: () => (
                 <div className='alert alert-danger'>
-                    <FormattedHTMLMessage
+                    <FormattedMessage
                         id='user.settings.tokens.confirmCreateMessage'
                         defaultMessage='You are generating a personal access token with System Admin permissions. Are you sure want to create this token?'
                     />
@@ -580,3 +581,4 @@ export default class UserAccessTokenSection extends React.PureComponent {
         );
     }
 }
+/* eslint-enable react/no-string-refs */

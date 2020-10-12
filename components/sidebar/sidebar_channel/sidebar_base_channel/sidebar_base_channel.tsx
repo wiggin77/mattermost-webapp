@@ -5,7 +5,7 @@ import React from 'react';
 
 import {Channel} from 'mattermost-redux/types/channels';
 
-import {trackEvent} from 'actions/diagnostics_actions';
+import {trackEvent} from 'actions/telemetry_actions';
 import * as GlobalActions from 'actions/global_actions';
 
 import SidebarChannelLink from 'components/sidebar/sidebar_channel/sidebar_channel_link';
@@ -15,7 +15,7 @@ import Constants from 'utils/constants';
 type Props = {
     channel: Channel;
     currentTeamName: string;
-    enableXToLeaveChannelsFromLHS?: string;
+    isCollapsed: boolean;
     actions: {
         leaveChannel: (channelId: any) => void;
     };
@@ -37,14 +37,12 @@ export default class SidebarBaseChannel extends React.PureComponent<Props, State
     }
 
     getCloseHandler = () => {
-        const {channel, enableXToLeaveChannelsFromLHS} = this.props;
+        const {channel} = this.props;
 
-        if (enableXToLeaveChannelsFromLHS === 'true') {
-            if (channel.type === Constants.OPEN_CHANNEL && channel.name !== Constants.DEFAULT_CHANNEL) {
-                return this.handleLeavePublicChannel;
-            } else if (channel.type === Constants.PRIVATE_CHANNEL) {
-                return this.handleLeavePrivateChannel;
-            }
+        if (channel.type === Constants.OPEN_CHANNEL && channel.name !== Constants.DEFAULT_CHANNEL) {
+            return this.handleLeavePublicChannel;
+        } else if (channel.type === Constants.PRIVATE_CHANNEL) {
+            return this.handleLeavePrivateChannel;
         }
 
         return null;
@@ -84,6 +82,7 @@ export default class SidebarBaseChannel extends React.PureComponent<Props, State
                 ariaLabelPrefix={ariaLabelPrefix}
                 closeHandler={this.getCloseHandler()!}
                 icon={this.getIcon()!}
+                isCollapsed={this.props.isCollapsed}
             />
         );
     }

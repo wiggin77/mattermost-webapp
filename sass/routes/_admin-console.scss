@@ -15,8 +15,17 @@
         flex-direction: column;
         height: 100vh;
 
+        // Fix for Safari on iOS MM-24361
+        @supports (-webkit-touch-callout: none) {
+            height: -webkit-fill-available;
+        }
+
         .announcement-bar--fixed & {
             height: calc(100vh - 32px);
+        }
+
+        .announcement-banner-tall--fixed & {
+            height: calc(100vh - 40px);
         }
     }
 
@@ -69,7 +78,15 @@
     }
 
     .filtered-user-list {
-        height: calc(100vh - 160px);
+        height: calc(100vh - 175px);
+
+        .announcement-bar--fixed & {
+            height: calc(100vh - 205px);
+        }
+
+        .announcement-banner-tall--fixed & {
+            height: calc(100vh - 205px);
+        }
     }
 
     .Select-value-label {
@@ -488,6 +505,17 @@
     .trial {
         margin-top: 15px;
     }
+    .trial-error {
+        color: $dark-gray;
+        font-weight: 400;
+        margin-top: 10px;
+    }
+    .trial-legal-terms, .upgrade-legal-terms {
+        margin-top: 10px;
+        margin-bottom: 0;
+        color: $dark-gray;
+        font-weight: 400;
+    }
 }
 
 .job-table__cancel-button {
@@ -574,6 +602,11 @@
     body.announcement-bar--fixed & {
         top: $announcement-bar-height;
         padding-bottom: $announcement-bar-height;
+    }
+
+    body.announcement-banner-tall--fixed & {
+        top: 40px;
+        padding-bottom: 40px;
     }
 
     .dropdown-menu {
@@ -940,4 +973,25 @@
     .tooltip-inner {
         max-width: none;
     }
+}
+
+.admin-console .admin-console__content.admin-logs-content {
+    max-width: none;
+
+    // We keep the banner the same width and only expand the content box.
+    .banner {
+        max-width: 920px;
+    }
+}
+
+div[disabled] {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.enterprise-license-text {
+    padding: 10px;
+    text-align: justify;
+    border: 1px solid $light-gray;
+    background: white;
 }

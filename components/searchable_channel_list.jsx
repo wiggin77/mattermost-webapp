@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+/* eslint-disable react/no-string-refs */
 
 import $ from 'jquery';
 import PropTypes from 'prop-types';
@@ -38,12 +39,15 @@ export default class SearchableChannelList extends React.PureComponent {
             page: 0,
             nextDisabled: false,
         };
+
+        this.filter = React.createRef();
+        this.channelListScroll = React.createRef();
     }
 
     componentDidMount() {
         // only focus the search box on desktop so that we don't cause the keyboard to open on mobile
-        if (!UserAgent.isMobile() && this.refs.filter) {
-            this.refs.filter.focus();
+        if (!UserAgent.isMobile() && this.filter.current) {
+            this.filter.current.focus();
         }
     }
 
@@ -113,17 +117,17 @@ export default class SearchableChannelList extends React.PureComponent {
         this.setState({page: this.state.page + 1, nextDisabled: true});
         this.nextTimeoutId = setTimeout(() => this.setState({nextDisabled: false}), NEXT_BUTTON_TIMEOUT_MILLISECONDS);
         this.props.nextPage(this.state.page + 1);
-        $(ReactDOM.findDOMNode(this.refs.channelListScroll)).scrollTop(0);
+        $(ReactDOM.findDOMNode(this.channelListScroll.current)).scrollTop(0);
     }
 
     previousPage = (e) => {
         e.preventDefault();
         this.setState({page: this.state.page - 1});
-        $(ReactDOM.findDOMNode(this.refs.channelListScroll)).scrollTop(0);
+        $(ReactDOM.findDOMNode(this.channelListScroll.current)).scrollTop(0);
     }
 
     doSearch = () => {
-        const term = this.refs.filter.value;
+        const term = this.filter.current.value;
         this.props.search(term);
         if (term === '') {
             this.setState({page: 0});
@@ -197,7 +201,7 @@ export default class SearchableChannelList extends React.PureComponent {
                 <div className='col-sm-12'>
                     <QuickInput
                         id='searchChannelsTextbox'
-                        ref='filter'
+                        ref={this.filter}
                         className='form-control filter-textbox'
                         placeholder={{id: t('filtered_channels_list.search'), defaultMessage: 'Search channels'}}
                         inputComponent={LocalizedInput}
@@ -213,7 +217,7 @@ export default class SearchableChannelList extends React.PureComponent {
                     <div className='search_input'>
                         <QuickInput
                             id='searchChannelsTextbox'
-                            ref='filter'
+                            ref={this.filter}
                             className='form-control filter-textbox'
                             placeholder={{id: t('filtered_channels_list.search'), defaultMessage: 'Search channels'}}
                             inputComponent={LocalizedInput}
@@ -268,7 +272,7 @@ export default class SearchableChannelList extends React.PureComponent {
                 >
                     <div
                         id='moreChannelsList'
-                        ref='channelListScroll'
+                        ref={this.channelListScroll}
                     >
                         {listContent}
                     </div>
@@ -301,3 +305,4 @@ SearchableChannelList.propTypes = {
     shouldShowArchivedChannels: PropTypes.bool.isRequired,
     canShowArchivedChannels: PropTypes.bool.isRequired,
 };
+/* eslint-enable react/no-string-refs */

@@ -693,7 +693,7 @@ describe('PostUtils.createAriaLabelForPost', () => {
         assert.ok(ariaLabel.indexOf(testPost.message));
         assert.ok(ariaLabel.indexOf('3 attachments'));
         assert.ok(ariaLabel.indexOf('2 reactions'));
-        assert.ok(ariaLabel.indexOf('message is flagged and pinned'));
+        assert.ok(ariaLabel.indexOf('message is saved and pinned'));
     });
     test('Should show that message is a reply', () => {
         const intl = createIntl({locale: 'en', messages: enMessages, defaultLocale: 'en'}, {});
@@ -727,6 +727,20 @@ describe('PostUtils.createAriaLabelForPost', () => {
         assert.ok(ariaLabel.indexOf('non-potable water emoji'));
         assert.ok(ariaLabel.indexOf(':space emoji:'));
         assert.ok(ariaLabel.indexOf(':not_an_emoji:'));
+    });
+    test('Generating aria label should not break if message is undefined', () => {
+        const intl = createIntl({locale: 'en', messages: enMessages, defaultLocale: 'en'}, {});
+
+        const testPost = {
+            id: 32,
+            message: undefined,
+            create_at: (new Date().getTime() / 1000) || 0,
+        };
+        const author = 'test_author';
+        const reactions = {};
+        const isFlagged = true;
+
+        assert.doesNotThrow(() => PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap));
     });
 });
 

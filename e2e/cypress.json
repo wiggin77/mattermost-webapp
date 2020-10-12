@@ -8,10 +8,17 @@
     "integrationFolder": "..",
     "testFiles": "**/*_spec.js",
     "env": {
-        "storybookUrl": "http://localhost:6006/",
-        "webhookBaseUrl": "http://localhost:3000",
+        "adminUsername": "sysadmin",
+        "adminPassword": "Sys@dmin-sample1",
+        "dbClient": "postgres",
+        "dbConnection": "postgres://mmuser:mostest@localhost/mattermost_test?sslmode=disable\u0026connect_timeout=10",
+        "enableApplitools": false,
+        "enableVisualTest": false,
         "ldapServer": "localhost",
         "ldapPort": 389,
-        "runLDAPSync": true
+        "runLDAPSync": true,
+        "resetBeforeTest": false,
+        "storybookUrl": "http://localhost:6006/",
+        "webhookBaseUrl": "http://localhost:3000"
     }
 }

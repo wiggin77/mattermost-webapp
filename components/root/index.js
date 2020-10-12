@@ -6,7 +6,6 @@ import {connect} from 'react-redux';
 
 import {getConfig} from 'mattermost-redux/selectors/entities/general';
 import {shouldShowTermsOfService, getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
-
 import {getTeam} from 'mattermost-redux/selectors/entities/teams';
 
 import {loadMeAndConfig} from 'actions/views/root';
@@ -23,9 +22,9 @@ function mapStateToProps(state) {
     const permalinkRedirectTeam = getTeam(state, teamId);
 
     return {
-        diagnosticsEnabled: config.DiagnosticsEnabled === 'true',
+        telemetryEnabled: config.DiagnosticsEnabled === 'true',
         noAccounts: config.NoAccounts === 'true',
-        diagnosticId: config.DiagnosticId,
+        telemetryId: config.DiagnosticId,
         permalinkRedirectTeamName: permalinkRedirectTeam ? permalinkRedirectTeam.name : '',
         showTermsOfService,
         plugins,

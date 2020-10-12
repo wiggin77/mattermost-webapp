@@ -9,7 +9,7 @@ import {Link} from 'react-router-dom';
 import {Permissions} from 'mattermost-redux/constants';
 
 import {emitUserLoggedOutEvent} from 'actions/global_actions.jsx';
-import {trackEvent} from 'actions/diagnostics_actions.jsx';
+import {trackEvent} from 'actions/telemetry_actions.jsx';
 
 import * as UserAgent from 'utils/user_agent';
 import Constants from 'utils/constants';
@@ -336,7 +336,7 @@ export default class SelectTeam extends React.PureComponent {
                 {headerButton}
                 <div className='col-sm-12'>
                     <div
-                        className={'signup-team__container'}
+                        className={'select-team__container signup-team__container'}
                     >
                         <img
                             alt={'signup team logo'}

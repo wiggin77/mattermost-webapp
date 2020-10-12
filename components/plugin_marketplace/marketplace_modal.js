@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+/* eslint-disable react/no-string-refs */
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -15,7 +16,7 @@ import PluginIcon from 'components/widgets/icons/plugin_icon.jsx';
 import LoadingScreen from 'components/loading_screen';
 import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
 
-import {trackEvent} from 'actions/diagnostics_actions.jsx';
+import {trackEvent} from 'actions/telemetry_actions.jsx';
 import {t} from 'utils/i18n';
 import {localizeMessage} from 'utils/utils';
 
@@ -158,7 +159,7 @@ export class MarketplaceModal extends React.PureComponent {
     }
 
     doSearch = async () => {
-        trackEvent('plugins', 'ui_marketplace_search');
+        trackEvent('plugins', 'ui_marketplace_search', {filter: this.state.filter});
 
         const {error} = await this.props.actions.filterPlugins(this.state.filter);
 
@@ -255,3 +256,4 @@ export class MarketplaceModal extends React.PureComponent {
         );
     }
 }
+/* eslint-enable react/no-string-refs */

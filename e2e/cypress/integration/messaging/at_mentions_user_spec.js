@@ -10,38 +10,32 @@
 // Stage: @prod
 // Group: @messaging
 
-function verifySuggestionList({input, expected, withoutSuggestion}) {
-    cy.get('#post_textbox').clear().type(input);
+describe('Mention self', () => {
+    let testUser;
 
-    if (withoutSuggestion) {
-        cy.get('#suggestionList').should('not.exist');
-    } else {
-        const re = new RegExp(expected, 'g');
-        cy.get('#suggestionList').should('be.visible').within(() => {
-            cy.findByText(re).should('be.visible');
-        });
-    }
-}
-
-describe('Mention user', () => {
     before(() => {
-        // # Login and go to /
-        cy.apiLogin('user-1');
-        cy.visit('/ad-1/channels/town-square');
+        // # Login as test user and visit town-square
+        cy.apiInitSetup().then(({team, user}) => {
+            testUser = user;
+
+            cy.apiLogin(testUser);
+            cy.visit(`/${team.name}/channels/town-square`);
+        });
     });
 
-    it('M19761 autocomplete should match on cases', () => {
+    it('should be always highlighted', () => {
         [
-            {input: '@samuel.tucker', expected: 'Samuel Tucker'},
-            {input: '@samuel', expected: 'Samuel Tucker'},
-            {input: '@tucker', expected: 'Samuel Tucker'},
-            {input: '@Samuel', expected: 'Samuel Tucker'},
-            {input: '@Tucker', expected: 'Samuel Tucker'},
-            {input: '@Samuel Tuc', expected: 'Samuel Tucker'},
-            {input: '@Samuel Tucker', expected: 'Samuel Tucker'},
-            {input: '@Samuel Tucker ', expected: 'Samuel Tucker', withoutSuggestion: true},
-        ].forEach((testCase) => {
-            verifySuggestionList(testCase);
+            `@${testUser.username}`,
+            `@${testUser.username}.`,
+            `@${testUser.username}_`,
+            `@${testUser.username}-`,
+            `@${testUser.username},`,
+        ].forEach((message) => {
+            cy.postMessage(message);
+
+            cy.getLastPostId().then((postId) => {
+                cy.get(`#postMessageText_${postId}`).find('.mention--highlight');
+            });
         });
     });
 });
