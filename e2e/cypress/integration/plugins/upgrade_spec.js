@@ -7,7 +7,6 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
-// Stage: @prod
 // Group: @system_console @plugin
 
 /**
@@ -30,11 +29,11 @@ describe('Plugin remains enabled when upgraded', () => {
     before(() => {
         // # Initialize setup and visit town-square
         cy.apiInitSetup().then(({team}) => {
-            cy.visit(`/${team.name}/channels/town-square`);
+            cy.visitAndWait(`/${team.name}/channels/town-square`);
 
             // # If Demo plugin is already enabled , uninstall it
             cy.apiRemovePluginById(pluginIdDemo);
-            cy.visit('/admin_console/plugins/plugin_management');
+            cy.visitAndWait('/admin_console/plugins/plugin_management');
             cy.get('.admin-console__header', {timeout: TIMEOUTS.ONE_MIN}).should('be.visible').and('have.text', 'Plugin Management');
         });
     });

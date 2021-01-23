@@ -23,6 +23,8 @@ describe('Markdown', () => {
     let townsquareLink;
 
     before(() => {
+        cy.shouldNotRunOnCloudEdition();
+
         // # Enable latex
         cy.apiUpdateConfig({
             ServiceSettings: {
@@ -34,7 +36,7 @@ describe('Markdown', () => {
         // # Login as test user and visit town-square
         cy.apiInitSetup({loginAfter: true}).then(({team}) => {
             townsquareLink = `/${team.name}/channels/town-square`;
-            cy.visit(townsquareLink);
+            cy.visitAndWait(townsquareLink);
         });
     });
 
