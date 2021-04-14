@@ -12,8 +12,6 @@
  * Environment variables:
  *   For saving artifacts to AWS S3
  *      - AWS_S3_BUCKET, AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
- *   For saving reports to Automation dashboard
- *      - DASHBOARD_ENABLE, DASHBOARD_ENDPOINT and DASHBOARD_TOKEN
  *   For saving test cases to Test Management
  *      - TM4J_ENABLE=true|false
  *      - TM4J_API_KEY=[api_key]
@@ -40,7 +38,6 @@ const {
 } = require('./utils/report');
 const {saveArtifacts} = require('./utils/artifacts');
 const {MOCHAWESOME_REPORT_DIR, RESULTS_DIR} = require('./utils/constants');
-const {saveDashboard} = require('./utils/dashboard');
 const {createTestCycle, createTestExecutions} = require('./utils/test_cases');
 
 require('dotenv').config();
@@ -50,12 +47,12 @@ const saveReport = async () => {
         BRANCH,
         BUILD_ID,
         BUILD_TAG,
-        DASHBOARD_ENABLE,
         DIAGNOSTIC_WEBHOOK_URL,
         DIAGNOSTIC_USER_ID,
         DIAGNOSTIC_TEAM_ID,
         FAILURE_MESSAGE,
         TM4J_ENABLE,
+        TM4J_CYCLE_KEY,
         TYPE,
         WEBHOOK_URL,
     } = process.env;
@@ -85,11 +82,11 @@ const saveReport = async () => {
         console.log('Successfully uploaded artifacts to S3:', result.reportLink);
     }
 
-    // Create test cycle to Test Management
+    // Create or use an existing test cycle
     let testCycle = {};
     if (TM4J_ENABLE === 'true') {
         const {start, end} = jsonReport.stats;
-        testCycle = await createTestCycle(start, end);
+        testCycle = TM4J_CYCLE_KEY ? {key: TM4J_CYCLE_KEY} : await createTestCycle(start, end);
     }
 
     // Send test report to "QA: UI Test Automation" channel via webhook
@@ -104,11 +101,6 @@ const saveReport = async () => {
     if (TYPE === 'RELEASE' && DIAGNOSTIC_WEBHOOK_URL && DIAGNOSTIC_USER_ID && DIAGNOSTIC_TEAM_ID) {
         const data = generateDiagnosticReport(summary, {userId: DIAGNOSTIC_USER_ID, teamId: DIAGNOSTIC_TEAM_ID});
         await sendReport('test info for diagnostic analysis', DIAGNOSTIC_WEBHOOK_URL, data);
-    }
-
-    // Save data to automation dashboard
-    if (DASHBOARD_ENABLE === 'true') {
-        await saveDashboard(jsonReport, BRANCH);
     }
 
     // Save test cases to Test Management

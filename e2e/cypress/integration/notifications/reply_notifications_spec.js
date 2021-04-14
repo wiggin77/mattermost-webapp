@@ -77,7 +77,7 @@ describe('reply-notifications', () => {
     });
 
     it('MM-T551 Do not trigger notifications on messages in reply threads unless I\'m mentioned', () => {
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         // Setup notification spy
         spyNotificationAs('notifySpy', 'granted');
@@ -103,7 +103,7 @@ describe('reply-notifications', () => {
             cy.get('@notifySpy').should('be.not.called');
 
             // * Verify unread mentions badge does not exist
-            cy.get('#sidebarItem_town-square').find('#unreadMentions').should('be.not.visible');
+            cy.get('#sidebarItem_town-square').find('#unreadMentions').should('not.exist');
 
             // # Switch again to other channel
             cy.get(`#sidebarItem_${otherChannel.name}`).click({force: true});
@@ -120,7 +120,7 @@ describe('reply-notifications', () => {
     });
 
     it('MM-T552 Trigger notifications on messages in threads that I start', () => {
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         // Setup notification spy
         spyNotificationAs('notifySpy', 'granted');
@@ -166,7 +166,7 @@ describe('reply-notifications', () => {
     });
 
     it('MM-T553 Trigger notifications on messages in reply threads that I start or participate in - start thread', () => {
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         // Setup notification spy
         spyNotificationAs('notifySpy', 'granted');
@@ -209,7 +209,7 @@ describe('reply-notifications', () => {
     });
 
     it('MM-T554 Trigger notifications on messages in reply threads that I start or participate in - participate in', () => {
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         // Setup notification spy
         spyNotificationAs('notifySpy', 'granted');

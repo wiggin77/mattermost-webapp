@@ -57,14 +57,14 @@ describe('Guest Account - Guest User Removal Experience', () => {
                     cy.apiAddUserToTeam(team1.id, guest.id);
                     cy.apiAddUserToTeam(team2.id, guest.id).then(() => {
                         cy.apiLogin(guest);
-                        cy.visitAndWait(`/${team2.name}/channels/town-square`);
+                        cy.visit(`/${team2.name}/channels/town-square`);
                     });
                 });
             });
         });
     });
 
-    it('MM-18044 Verify behavior when Guest User is removed from channel', () => {
+    it('MM-T1360 Taken to login screen when removed from last channel', () => {
         // # Demote the current member to a guest user
         cy.apiAdminLogin();
         cy.apiDemoteUserToGuest(guest.id);

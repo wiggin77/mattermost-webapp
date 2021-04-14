@@ -19,7 +19,7 @@ describe('Integrations', () => {
 
         // # Initialize setup and visit town-square
         cy.apiInitSetup().then(({team}) => {
-            cy.visitAndWait(`/${team.name}/channels/town-square`);
+            cy.visit(`/${team.name}/channels/town-square`);
 
             // # If Demo plugin is already enabled, uninstall it
             cy.apiRemovePluginById(pluginIdDemo, true);
@@ -182,7 +182,7 @@ describe('Integrations', () => {
         cy.get('#post_textbox').type(' ');
 
         // * Verify command text is no longer visible after space is added
-        cy.findByText('Rename the channel').should('not.be.visible');
+        cy.findByText('Rename the channel').should('not.exist');
 
         // * Verify suggestion list is visible with 2 children
         cy.get('#suggestionList').should('be.visible').children().should('have.length', 2);

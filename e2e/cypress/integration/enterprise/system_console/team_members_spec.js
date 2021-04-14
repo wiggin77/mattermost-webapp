@@ -43,21 +43,24 @@ describe('Team members test', () => {
 
     it('MM-23938 - Team members block is only visible when team is not group synced', () => {
         // # Visit the team page
-        cy.visitAndWait(`/admin_console/user_management/teams/${testTeam.id}`);
+        cy.visit(`/admin_console/user_management/teams/${testTeam.id}`);
 
         // * Assert that the members block is visible on non group synced team
         cy.get('#teamMembers').scrollIntoView().should('be.visible');
 
         // # Click the sync group members switch
-        cy.findByTestId('syncGroupSwitch').scrollIntoView().click();
+        cy.findByTestId('syncGroupSwitch').
+            scrollIntoView().
+            findByRole('button').
+            click({force: true});
 
         // * Assert that the members block is no longer visible
-        cy.get('#teamMembers').should('not.be.visible');
+        cy.get('#teamMembers').should('not.exist');
     });
 
     it('MM-23938 - Team members block can search for users, remove users, add users and modify their roles', () => {
         // # Visit the team page
-        cy.visitAndWait(`/admin_console/user_management/teams/${testTeam.id}`);
+        cy.visit(`/admin_console/user_management/teams/${testTeam.id}`);
 
         // * Assert that the members block is visible on non group synced team
         cy.get('#teamMembers').scrollIntoView().should('be.visible');
@@ -66,7 +69,7 @@ describe('Team members test', () => {
         searchFor(user1.email);
 
         // # Wait till loading complete and then remove the only visible user
-        cy.get('#teamMembers .DataGrid_loading').should('not.be.visible');
+        cy.get('#teamMembers .DataGrid_loading').should('not.exist');
         cy.get('#teamMembers .UserGrid_removeRow a').should('be.visible').click();
 
         // # Attempt to save
@@ -82,7 +85,7 @@ describe('Team members test', () => {
         searchFor(user2.email);
 
         // # Wait till loading complete and then remove the only visible user
-        cy.get('#teamMembers .DataGrid_loading').should('not.be.visible');
+        cy.get('#teamMembers .DataGrid_loading').should('not.exist');
         cy.get('#teamMembers .UserGrid_removeRow a').should('be.visible').click();
 
         // # Attempt to save
@@ -95,10 +98,10 @@ describe('Team members test', () => {
         cy.get('#confirmModalButton').click();
 
         // # Check that the members block is no longer visible meaning that the save has succeeded and we were redirected out
-        cy.get('#teamMembers').should('not.be.visible');
+        cy.get('#teamMembers').should('not.exist');
 
         // # Visit the team page
-        cy.visitAndWait(`/admin_console/user_management/teams/${testTeam.id}`);
+        cy.visit(`/admin_console/user_management/teams/${testTeam.id}`);
 
         // # Search for user1 that we know is no longer in the team
         searchFor(user1.email);
@@ -152,11 +155,11 @@ describe('Team members test', () => {
         saveConfig();
 
         // # Visit the team page
-        cy.visitAndWait(`/admin_console/user_management/teams/${testTeam.id}`);
+        cy.visit(`/admin_console/user_management/teams/${testTeam.id}`);
 
         // # Search user1 that we know is now in the team again
         searchFor(user1.email);
-        cy.get('#teamMembers .DataGrid_loading').should('not.be.visible');
+        cy.get('#teamMembers .DataGrid_loading').should('not.exist');
 
         // * Assert that the user is now saved as an admin
         cy.get('#teamMembers .DataGrid_rows').children(0).should('contain', user1.email).and('not.contain', 'New').and('contain', 'Team Admin');
@@ -175,7 +178,7 @@ describe('Team members test', () => {
 
         // # Search user2 that we know is now in the team again
         searchFor(user2.email);
-        cy.get('#teamMembers .DataGrid_loading').should('not.be.visible');
+        cy.get('#teamMembers .DataGrid_loading').should('not.exist');
 
         // * Assert user2 is now saved as a regular member
         cy.get('#teamMembers .DataGrid_rows').children(0).should('contain', user2.email).and('not.contain', 'New').and('contain', 'Member');
@@ -195,5 +198,5 @@ function saveConfig() {
     cy.get('#saveSetting').click();
 
     // # Check that the members block is no longer visible meaning that the save has succeeded and we were redirected out
-    cy.get('#teamMembers').should('not.be.visible');
+    cy.get('#teamMembers').should('not.exist');
 }

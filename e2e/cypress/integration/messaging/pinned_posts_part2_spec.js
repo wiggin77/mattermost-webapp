@@ -38,7 +38,7 @@ describe('Pinned posts part 2', () => {
         cy.apiLogin(testUser);
 
         // # Visit a test channel and post a message
-        cy.visitAndWait(`/${testTeam.name}/channels/${testChannel.name}`);
+        cy.visit(`/${testTeam.name}/channels/${testChannel.name}`);
         cy.postMessage('Hello');
 
         cy.getLastPostId().then((postId) => {
@@ -50,15 +50,15 @@ describe('Pinned posts part 2', () => {
             cy.get(`#CENTER_commentIcon_${postId}`).click({force: true});
 
             // * Verify that pinned icon is there both in center and RHS
-            cy.get(`#rhsPost_${postId} .post-pre-header`).should('have.text', 'Pinned');
-            cy.get(`#post_${postId} .post-pre-header`).should('have.text', 'Pinned');
+            cy.get(`#rhsPost_${postId}`).find('.post-pre-header').should('be.visible').and('have.text', 'Pinned');
+            cy.get(`#post_${postId}`).find('.post-pre-header').should('be.visible').and('have.text', 'Pinned');
 
             // # Un-pin the post from RHS
             unpinPost(postId);
 
             // * Verify that pinned icon is gone from center and RHS
-            cy.get(`#rhsPost_${postId} .post-pre-header`).should('not.have.text', 'Pinned');
-            cy.get(`#post_${postId} .post-pre-header`).should('not.have.text', 'Pinned');
+            cy.get(`#rhsPost_${postId}`).find('.post-pre-header').should('not.exist');
+            cy.get(`#post_${postId}`).find('.post-pre-header').should('not.exist');
 
             // # Click pin icon
             cy.get('#channelHeaderPinButton').should('be.visible').click();
@@ -73,7 +73,7 @@ describe('Pinned posts part 2', () => {
         cy.apiLogin(testUser);
 
         // # Visit a test channel
-        cy.visitAndWait(`/${testTeam.name}/channels/${testChannel.name}`);
+        cy.visit(`/${testTeam.name}/channels/${testChannel.name}`);
 
         cy.getLastPostId().then((postId) => {
             // # Pin the post
@@ -95,7 +95,7 @@ describe('Pinned posts part 2', () => {
             cy.findByTestId('search-item-container').should('not.exist');
 
             // # Visit a test channel
-            cy.visitAndWait(`/${testTeam.name}/channels/${testChannel.name}`);
+            cy.visit(`/${testTeam.name}/channels/${testChannel.name}`);
 
             // # Unpin the post again
             unpinPost(postId);
@@ -108,7 +108,7 @@ describe('Pinned posts part 2', () => {
             cy.apiLogin(testUser);
 
             // # Visit the DM channel
-            cy.visitAndWait(`/${testTeam.name}/channels/${testUser.id}__${otherUser.id}`);
+            cy.visit(`/${testTeam.name}/channels/${testUser.id}__${otherUser.id}`);
 
             // # Click pin icon
             cy.get('#channelHeaderPinButton', {timeout: TIMEOUTS.ONE_MIN}).should('be.visible').click();
@@ -137,7 +137,7 @@ describe('Pinned posts part 2', () => {
         cy.apiLogin(testUser);
 
         // # Visit a test channel
-        cy.visitAndWait(`/${testTeam.name}/channels/${testChannel.name}`);
+        cy.visit(`/${testTeam.name}/channels/${testChannel.name}`);
 
         // # Click pin icon
         cy.get('#channelHeaderPinButton').should('be.visible').click();
@@ -214,7 +214,7 @@ describe('Pinned posts part 2', () => {
         cy.apiLogin(testUser);
 
         // # Visit town square
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         // * Pinned count should be zero
         cy.get('#channelPinnedPostCountText').should('not.exist');
@@ -230,7 +230,7 @@ describe('Pinned posts part 2', () => {
             cy.get('#channelPinnedPostCountText').should('have.text', '1');
 
             // # Visit a test channel
-            cy.visitAndWait(`/${testTeam.name}/channels/${testChannel.name}`);
+            cy.visit(`/${testTeam.name}/channels/${testChannel.name}`);
 
             // * Pinned count should be zero
             cy.get('#channelPinnedPostCountText').should('not.exist');

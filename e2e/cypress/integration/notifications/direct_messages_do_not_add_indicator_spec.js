@@ -41,8 +41,9 @@ describe('Notifications', () => {
 
             // # Remove mention notification (for initial channel).
             cy.apiLogin(user1);
-            cy.visitAndWait(testTeam1TownSquareUrl);
-            cy.get('#publicChannelList').get('.unread-title').click();
+            cy.visit(testTeam1TownSquareUrl);
+            cy.findByText('CHANNELS').get('.unread-title').click();
+            cy.findByText('CHANNELS').get('.unread-title').should('not.exist');
             cy.apiLogout();
         });
     });
@@ -50,7 +51,7 @@ describe('Notifications', () => {
     it('MM-T561 Browser tab and team sidebar - direct messages don\'t add indicator on team icon in team sidebar (but do in browser tab)', () => {
         // # User A: Join teams A and B. Open team A
         cy.apiLogin(user1);
-        cy.visitAndWait(testTeam1TownSquareUrl);
+        cy.visit(testTeam1TownSquareUrl);
 
         // # User B: Join team B
         // # User B: Post a direct message to user A
@@ -62,9 +63,9 @@ describe('Notifications', () => {
         cy.title().should('include', `(1) Town Square - ${team1.display_name} ${siteName}`);
 
         // * Team sidebar shows: No unread / mention indicator in team sidebar on either team
-        cy.get(`#${team2.name}TeamButton`).parent('.unread').should('not.be.visible');
+        cy.get(`#${team2.name}TeamButton`).parent('.unread').should('not.exist');
         cy.get(`#${team2.name}TeamButton`).parent().within(() => {
-            cy.get('.badge').should('not.be.visible');
+            cy.get('.badge').should('not.exist');
         });
     });
 });

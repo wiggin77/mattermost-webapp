@@ -82,7 +82,7 @@ const languages = {
     },
     sv: {
         value: 'sv',
-        name: 'Svenska (Beta)',
+        name: 'Svenska',
         order: 9,
         url: sv,
     },

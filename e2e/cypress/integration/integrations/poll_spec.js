@@ -56,7 +56,7 @@ describe('/poll', () => {
     beforeEach(() => {
         cy.apiLogout();
         cy.apiLogin(user1);
-        cy.visitAndWait(testChannelUrl);
+        cy.visit(testChannelUrl);
     });
 
     after(() => {
@@ -108,7 +108,7 @@ describe('/poll', () => {
 
         cy.apiLogout();
         cy.apiLogin(user2);
-        cy.visitAndWait(testChannelUrl);
+        cy.visit(testChannelUrl);
 
         // # Another user clicks Yes or No
         cy.getNthPostId(-3).then((postId) => {
@@ -119,7 +119,7 @@ describe('/poll', () => {
 
         cy.apiLogout();
         cy.apiLogin(user1);
-        cy.visitAndWait(testChannelUrl);
+        cy.visit(testChannelUrl);
         cy.getNthPostId(-3).then((postId) => {
             cy.get(`#post_${postId}`).within(() => {
                 cy.findByText('End Poll').click();
@@ -166,7 +166,7 @@ describe('/poll', () => {
         });
         cy.apiLogout();
         cy.apiLogin(user2);
-        cy.visitAndWait(testChannelUrl);
+        cy.visit(testChannelUrl);
         cy.getLastPostId().then((postId) => {
             cy.get(`#post_${postId}`).within(() => {
                 cy.findByText('Yes').click();
@@ -174,7 +174,7 @@ describe('/poll', () => {
         });
         cy.apiLogout();
         cy.apiLogin(user1);
-        cy.visitAndWait(testChannelUrl);
+        cy.visit(testChannelUrl);
         cy.getLastPostId().then((postId) => {
             cy.get(`#post_${postId}`).within(() => {
                 // # Click "End Poll"
@@ -210,13 +210,13 @@ describe('/poll', () => {
             cy.get(`#post_${postId}`).within(() => {
                 // * Poll displays showing a slice of pizza emoji in place of the word "pizza"
                 cy.get('h1 > span[data-emoticon="pizza"]').should('be.visible');
-                cy.findByText('pizza').should('not.be.visible');
+                cy.findByText('pizza').should('not.exist');
 
                 // * Emoji for "thumbsup" and "thumbsdown" are shown in place of the words "yes" and "no"
                 cy.get('button > span[data-emoticon="thumbsup"]').should('be.visible');
                 cy.get('button > span[data-emoticon="thumbsdown"]').should('be.visible');
-                cy.findByText('thumbsup').should('not.be.visible');
-                cy.findByText('thumbsdown').should('not.be.visible');
+                cy.findByText('thumbsup').should('not.exist');
+                cy.findByText('thumbsdown').should('not.exist');
             });
         });
     });

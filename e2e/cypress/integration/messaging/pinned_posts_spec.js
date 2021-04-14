@@ -7,7 +7,6 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
-// Stage: @prod
 // Group: @messaging
 
 describe('Messaging', () => {
@@ -25,7 +24,7 @@ describe('Messaging', () => {
     });
 
     beforeEach(() => {
-        cy.visitAndWait(`/${testTeam.name}/channels/${testChannel.name}`);
+        cy.visit(`/${testTeam.name}/channels/${testChannel.name}`);
     });
 
     it('MM-T2167 Pin a post, view pinned posts', () => {

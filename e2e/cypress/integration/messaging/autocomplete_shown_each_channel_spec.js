@@ -20,7 +20,7 @@ describe('Identical Message Drafts', () => {
             testTeam = team;
             testChannel = channel;
 
-            cy.visitAndWait(`/${testTeam.name}/channels/${testChannel.name}`);
+            cy.visit(`/${testTeam.name}/channels/${testChannel.name}`);
         });
     });
 
@@ -43,7 +43,7 @@ describe('Identical Message Drafts', () => {
         // * Validate if the newly navigated channel is open
         // * autocomplete should not be visible in channel
         cy.url().should('include', `/channels/${testChannel.name}`);
-        cy.get('#suggestionList').should('not.be.visible');
+        cy.get('#suggestionList').should('not.exist');
 
         // # Start a draft in Channel B containing just "@"
         cy.get('#post_textbox').should('be.visible').type('@');

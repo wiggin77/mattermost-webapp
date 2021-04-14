@@ -18,12 +18,17 @@ import {t} from 'utils/i18n';
 import {intlShape} from 'utils/react_intl';
 import * as Utils from 'utils/utils.jsx';
 import Pluggable from 'plugins/pluggable';
-
 import AddUserToChannelModal from 'components/add_user_to_channel_modal';
 import LocalizedIcon from 'components/localized_icon';
 import ToggleModalButtonRedux from 'components/toggle_modal_button_redux';
 import Avatar from 'components/widgets/users/avatar';
 import Popover from 'components/widgets/popover';
+import SharedUserIndicator from 'components/shared_user_indicator.tsx';
+import CustomStatusEmoji from 'components/custom_status/custom_status_emoji';
+import CustomStatusModal from 'components/custom_status/custom_status_modal';
+import CustomStatusText from 'components/custom_status/custom_status_text';
+
+import './profile_popover.scss';
 
 /**
  * The profile popover, or hovercard, that appears with user information when clicking
@@ -50,6 +55,8 @@ class ProfilePopover extends React.PureComponent {
          * User the popover is being opened for
          */
         user: PropTypes.object,
+
+        channelId: PropTypes.string,
 
         /**
          * Status for the user, either 'offline', 'away', 'dnd' or 'online'
@@ -80,6 +87,8 @@ class ProfilePopover extends React.PureComponent {
          * @internal
          */
         currentUserId: PropTypes.string.isRequired,
+        customStatus: PropTypes.object,
+        isCustomStatusEnabled: PropTypes.bool.isRequired,
 
         /**
          * @internal
@@ -120,7 +129,7 @@ class ProfilePopover extends React.PureComponent {
          * @internal
          */
         actions: PropTypes.shape({
-            getMembershipForCurrentEntities: PropTypes.func.isRequired,
+            getMembershipForEntities: PropTypes.func.isRequired,
             openDirectChannelToUserId: PropTypes.func.isRequired,
             openModal: PropTypes.func.isRequired,
             closeModal: PropTypes.func.isRequired,
@@ -138,18 +147,21 @@ class ProfilePopover extends React.PureComponent {
         isRHS: false,
         hasMention: false,
         status: UserStatuses.OFFLINE,
+        customStatus: {},
     }
 
     constructor(props) {
         super(props);
-
         this.state = {
             loadingDMChannel: -1,
         };
     }
 
     componentDidMount() {
-        this.props.actions.getMembershipForCurrentEntities(this.props.userId);
+        const {currentTeamId, userId, channelId} = this.props;
+        if (currentTeamId && userId) {
+            this.props.actions.getMembershipForEntities(currentTeamId, userId, channelId);
+        }
     }
 
     handleShowDirectChannel = (e) => {
@@ -209,6 +221,20 @@ class ProfilePopover extends React.PureComponent {
         this.handleCloseModals();
     }
 
+    showCustomStatusModal = (e) => {
+        e.preventDefault();
+
+        if (this.props.hide) {
+            this.props.hide();
+        }
+        const customStatusInputModalData = {
+            ModalId: ModalIdentifiers.CUSTOM_STATUS,
+            dialogType: CustomStatusModal,
+        };
+
+        this.props.actions.openModal(customStatusInputModalData);
+    }
+
     handleAddToChannel = (e) => {
         e.preventDefault();
 
@@ -229,6 +255,60 @@ class ProfilePopover extends React.PureComponent {
         }
     };
 
+    renderCustomStatus() {
+        const {customStatus, isCustomStatusEnabled, user, currentUserId} = this.props;
+
+        const customStatusSet = (customStatus.text || customStatus.emoji);
+        const canSetCustomStatus = (user.id === currentUserId);
+        const shouldShowCustomStatus = isCustomStatusEnabled && customStatus && (customStatusSet || canSetCustomStatus);
+
+        if (!shouldShowCustomStatus) {
+            return null;
+        }
+
+        let customStatusContent;
+        if (customStatusSet) {
+            const customStatusEmoji = (
+                <span className='d-flex'>
+                    <CustomStatusEmoji
+                        userID={this.props.user.id}
+                        showTooltip={false}
+                        emojiStyle={{
+                            marginRight: 4,
+                        }}
+                    />
+                </span>
+            );
+
+            customStatusContent = (
+                <div className='d-flex'>
+                    {customStatusEmoji}
+                    <CustomStatusText
+                        tooltipDirection='top'
+                        text={customStatus.text}
+                        className='user-popover__email pb-1'
+                    />
+                </div>
+            );
+        } else if (canSetCustomStatus) {
+            customStatusContent = (
+                <div>
+                    <button
+                        className='user-popover__set-custom-status-btn'
+                        onClick={this.showCustomStatusModal}
+                    >
+                        <FormattedMessage
+                            id='user_profile.custom_status.set_status'
+                            defaultMessage='Set a status'
+                        />
+                    </button>
+                </div>
+            );
+        }
+
+        return customStatusContent;
+    }
+
     render() {
         if (!this.props.user) {
             return null;
@@ -237,6 +317,7 @@ class ProfilePopover extends React.PureComponent {
         const popoverProps = Object.assign({}, this.props);
         delete popoverProps.user;
         delete popoverProps.userId;
+        delete popoverProps.channelId;
         delete popoverProps.src;
         delete popoverProps.status;
         delete popoverProps.hideStatus;
@@ -258,8 +339,7 @@ class ProfilePopover extends React.PureComponent {
         const {formatMessage} = this.props.intl;
 
         var dataContent = [];
-        const urlSrc = this.props.overwriteIcon ?
-            this.props.overwriteIcon : this.props.src;
+        const urlSrc = this.props.overwriteIcon ? this.props.overwriteIcon : this.props.src;
 
         dataContent.push(
             <Avatar
@@ -282,20 +362,31 @@ class ProfilePopover extends React.PureComponent {
         }
 
         if (fullname && !haveOverrideProp) {
+            let sharedIcon;
+            if (this.props.user.remote_id) {
+                sharedIcon = (
+                    <SharedUserIndicator
+                        className='shared-user-icon'
+                        withTooltip={true}
+                    />
+                );
+            }
+
             dataContent.push(
-                <OverlayTrigger
-                    delayShow={Constants.OVERLAY_TIME_DELAY}
-                    placement='top'
-                    overlay={<Tooltip id='fullNameTooltip'>{fullname}</Tooltip>}
+                <div
+                    data-testId={`popover-fullname-${this.props.user.username}`}
+                    className='overflow--ellipsis text-nowrap'
                     key='user-popover-fullname'
                 >
-                    <div
-                        data-testId={`popover-fullname-${this.props.user.username}`}
-                        className='overflow--ellipsis text-nowrap'
+                    <OverlayTrigger
+                        delayShow={Constants.OVERLAY_TIME_DELAY}
+                        placement='top'
+                        overlay={<Tooltip id='fullNameTooltip'>{fullname}</Tooltip>}
                     >
-                        <strong>{fullname}</strong>
-                    </div>
-                </OverlayTrigger>,
+                        <span className='user-profile-popover__heading'>{fullname}</span>
+                    </OverlayTrigger>
+                    {sharedIcon}
+                </div>,
             );
         }
 
@@ -369,16 +460,39 @@ class ProfilePopover extends React.PureComponent {
                     key='user-popover-local-time'
                     className='pb-1'
                 >
-                    <FormattedMessage
-                        id='user_profile.account.localTime'
-                        defaultMessage='Local Time: '
-                    />
-                    <Timestamp
-                        useRelative={false}
-                        useDate={false}
-                        userTimezone={this.props.user.timezone}
-                        useTime={{hour: 'numeric', minute: 'numeric', timeZoneName: 'short'}}
-                    />
+                    <span className='user-profile-popover__heading'>
+                        <FormattedMessage
+                            id='user_profile.account.localTime'
+                            defaultMessage='Local Time'
+                        />
+                    </span>
+                    <div>
+                        <Timestamp
+                            useRelative={false}
+                            useDate={false}
+                            userTimezone={this.props.user.timezone}
+                            useTime={{hour: 'numeric', minute: 'numeric', timeZoneName: 'short'}}
+                        />
+                    </div>
+                </div>,
+            );
+        }
+
+        const customStatusContent = !haveOverrideProp && this.renderCustomStatus();
+        if (customStatusContent) {
+            dataContent.push(
+                <div
+                    key='user-popover-status'
+                    id='user-popover-status'
+                    className='pb-1'
+                >
+                    <span className='user-profile-popover__heading'>
+                        <FormattedMessage
+                            id='user_profile.custom_status'
+                            defaultMessage='Status'
+                        />
+                    </span>
+                    {customStatusContent}
                 </div>,
             );
         }

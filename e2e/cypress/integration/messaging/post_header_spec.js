@@ -1,4 +1,3 @@
-
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
@@ -21,12 +20,12 @@ describe('Post Header', () => {
         cy.apiInitSetup({loginAfter: true}).then(({team}) => {
             testTeam = team;
 
-            cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+            cy.visit(`/${testTeam.name}/channels/town-square`);
         });
     });
 
     beforeEach(() => {
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
     });
 
     it('should render permalink view on click of post timestamp at center view', () => {
@@ -66,8 +65,8 @@ describe('Post Header', () => {
         cy.getLastPostId().then((postId) => {
             // * Check that the center dot menu' button and dropdown are hidden
             cy.get(`#post_${postId}`).should('be.visible').within(() => {
-                cy.get(`#CENTER_button_${postId}`).should('not.be.visible');
-                cy.get('.dropdown-menu').should('not.be.visible');
+                cy.get(`#CENTER_button_${postId}`).should('not.exist');
+                cy.get('.dropdown-menu').should('not.exist');
             });
 
             // # Click dot menu of a post
@@ -84,8 +83,8 @@ describe('Post Header', () => {
 
             // * Check that the center dot menu and dropdown are hidden
             cy.get(`#post_${postId}`).should('be.visible').within(() => {
-                cy.get(`#CENTER_button_${postId}`).should('not.be.visible');
-                cy.get('.dropdown-menu').should('not.be.visible');
+                cy.get(`#CENTER_button_${postId}`).should('not.exist');
+                cy.get('.dropdown-menu').should('not.exist');
             });
         });
     });
@@ -134,7 +133,7 @@ describe('Post Header', () => {
         cy.closeRHS();
 
         // * Check that the RHS is close
-        cy.get('#rhsContainer').should('not.be.visible');
+        cy.get('#rhsContainer').should('not.exist');
     });
 
     it('MM-T122 Visual verification of "Searching" animation for Saved and Pinned posts', () => {

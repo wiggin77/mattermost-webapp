@@ -14,7 +14,7 @@ describe('Message deletion', () => {
     before(() => {
         // # Login as test user and visit town-square channel
         cy.apiInitSetup({loginAfter: true}).then(({team}) => {
-            cy.visitAndWait(`/${team.name}/channels/town-square`);
+            cy.visit(`/${team.name}/channels/town-square`);
         });
     });
 
@@ -52,16 +52,16 @@ describe('Message deletion', () => {
                 cy.get('#deletePostModalButton').click();
 
                 // * Check that the modal is closed
-                cy.get('#deletePostModal').should('not.be.visible');
+                cy.get('#deletePostModal').should('not.exist');
 
                 // * Check that the RHS is closed.
-                cy.get('#rhsContainer').should('not.be.visible');
+                cy.get('#rhsContainer').should('not.exist');
 
                 // * Check that parent message is no longer visible.
-                cy.get(`#post_${parentMessageId}`).should('not.be.visible');
+                cy.get(`#post_${parentMessageId}`).should('not.exist');
 
                 // * Check that reply message is no longer visible.
-                cy.get(`#post_${replyMessageId}`).should('not.be.visible');
+                cy.get(`#post_${replyMessageId}`).should('not.exist');
             });
 
             cy.getLastPostId().then((replyMessageId) => {

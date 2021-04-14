@@ -58,12 +58,12 @@ describe('Messaging', () => {
             testTeam = team;
             testChannel = channel;
 
-            cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+            cy.visit(`/${testTeam.name}/channels/town-square`);
         });
     });
 
     beforeEach(() => {
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
     });
 
     it('MM-T200 Focus move to main input box when a character key is selected', () => {
@@ -136,7 +136,7 @@ describe('Messaging', () => {
         cy.get('#reply_textbox').should('be.focused');
 
         //# Focus away from RHS textbox
-        cy.get('#rhsContent').click();
+        cy.get('#rhsContainer .post-right__content').click();
 
         //# Click reply arrow on post in same thread
         cy.clickPostCommentIcon();

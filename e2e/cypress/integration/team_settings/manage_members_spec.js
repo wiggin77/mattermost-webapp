@@ -32,7 +32,7 @@ describe('Manage Members', () => {
 
     it('MM-T2331 System Admin can promote Member to Team Admin', () => {
         // # Go to Town Square
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         // # Click Main Menu
         cy.get('#sidebarHeaderDropdownButton').should('be.visible').click();
@@ -62,7 +62,7 @@ describe('Manage Members', () => {
                 cy.apiLogin(testUser);
 
                 // # Go to Town Square
-                cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+                cy.visit(`/${testTeam.name}/channels/town-square`);
 
                 // # Click Main Menu
                 cy.get('#sidebarHeaderDropdownButton').should('be.visible').click();
@@ -98,7 +98,7 @@ describe('Manage Members', () => {
                         cy.apiLogin(testUser);
 
                         // # Go to Town Square
-                        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+                        cy.visit(`/${testTeam.name}/channels/town-square`);
 
                         // # Click Main Menu
                         cy.get('#sidebarHeaderDropdownButton').should('be.visible').click();
@@ -113,19 +113,19 @@ describe('Manage Members', () => {
                         cy.get(`#teamMembersDropdown_${user.username} ~ div button:contains(Remove from Team)`).should('be.visible').click();
 
                         // * Verify teammate no longer appears
-                        cy.get(`#teamMembersDropdown_${user.username}`).should('not.be.visible');
+                        cy.get(`#teamMembersDropdown_${user.username}`).should('not.exist');
 
                         // # Login as non admin user
                         cy.apiLogin(user);
 
                         // # Go to team that they are still a member of
-                        cy.visitAndWait(`/${otherTeam.name}/channels/town-square`);
+                        cy.visit(`/${otherTeam.name}/channels/town-square`);
 
                         // * Verify they are still a member
                         cy.get(`#headerTeamName:contains(${otherTeam.display_name})`, {timeout: TIMEOUTS.ONE_MIN}).should('be.visible');
 
                         // # Go to team that they were removed from
-                        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+                        cy.visit(`/${testTeam.name}/channels/town-square`);
 
                         // * Verify that they get a 'Team Not Found' screen
                         cy.url().should('include', '/error?type=team_not_found');
@@ -146,7 +146,7 @@ describe('Manage Members', () => {
                 cy.apiLogin(testUser);
 
                 // # Go to Town Square
-                cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+                cy.visit(`/${testTeam.name}/channels/town-square`);
 
                 // # Click Main Menu
                 cy.get('#sidebarHeaderDropdownButton').should('be.visible').click();
@@ -161,7 +161,7 @@ describe('Manage Members', () => {
                 cy.get(`#teamMembersDropdown_${user.username} ~ div button:contains(Remove from Team)`).should('be.visible').click();
 
                 // * Verify teammate no longer appears
-                cy.get(`#teamMembersDropdown_${user.username}`).should('not.be.visible');
+                cy.get(`#teamMembersDropdown_${user.username}`).should('not.exist');
 
                 // # Close the modal
                 cy.get('#teamMembersModal').find('button.close').should('be.visible').click();
@@ -172,13 +172,13 @@ describe('Manage Members', () => {
                     cy.apiLogin(user);
 
                     // # Go to team that they were removed from
-                    cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+                    cy.visit(`/${testTeam.name}/channels/town-square`);
 
                     // * Verify that they get a 'Team Not Found' screen
                     cy.url().should('include', '/error?type=team_not_found');
 
                     // # Go to the invite link
-                    cy.visitAndWait(inviteLink);
+                    cy.visit(inviteLink);
 
                     // * Verify that the user has rejoined the team
                     cy.get(`#headerTeamName:contains(${testTeam.display_name})`).should('be.visible');

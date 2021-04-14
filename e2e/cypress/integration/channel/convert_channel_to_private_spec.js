@@ -35,7 +35,7 @@ describe('Channels', () => {
         // # Create new test channel
         cy.apiCreateChannel(testTeam.id, 'channel-test', 'Channel').then(({channel}) => {
             // # Go to test channel
-            cy.visitAndWait(`/${testTeam.name}/channels/${channel.name}`);
+            cy.visit(`/${testTeam.name}/channels/${channel.name}`);
 
             // # Click the channel header dropdown
             cy.get('#channelHeaderDropdownIcon').click();
@@ -48,7 +48,7 @@ describe('Channels', () => {
             cy.get('#channelHeaderDropdownIcon').click();
 
             // * Channel convert to private should no longer be visible
-            cy.get('#channelConvertToPrivate').should('not.be.visible');
+            cy.get('#channelConvertToPrivate').should('not.exist');
         });
 
         // # Reset permissions to default
@@ -60,13 +60,13 @@ describe('Channels', () => {
         // # Create new test channel
         cy.apiCreateChannel(testTeam.id, 'channel-test', 'Channel').then(({channel}) => {
             // # Go to test channel
-            cy.visitAndWait(`/${testTeam.name}/channels/${channel.name}`);
+            cy.visit(`/${testTeam.name}/channels/${channel.name}`);
 
             // # Click the channel header dropdown
             cy.get('#channelHeaderDropdownIcon').click();
 
             // * Channel convert to private should no longer be visible
-            cy.get('#channelConvertToPrivate').should('not.be.visible');
+            cy.get('#channelConvertToPrivate').should('not.exist');
         });
 
         // # Reset permissions to default
@@ -85,13 +85,13 @@ describe('Channels', () => {
         // # Create new test channel
         cy.apiCreateChannel(testTeam.id, 'channel-test', 'Channel').then(({channel}) => {
             // # Go to test channel
-            cy.visitAndWait(`/${testTeam.name}/channels/${channel.name}`);
+            cy.visit(`/${testTeam.name}/channels/${channel.name}`);
 
             // # Click the channel header dropdown
             cy.get('#channelHeaderDropdownIcon').click();
 
             // * Channel convert to private should not be visible
-            cy.get('#channelConvertToPrivate').should('not.be.visible');
+            cy.get('#channelConvertToPrivate').should('not.exist');
         });
 
         // # Reset permissions to default
@@ -103,7 +103,7 @@ describe('Channels', () => {
         // # Create new test channel
         cy.apiCreateChannel(testTeam.id, 'channel-test', 'Channel').then(({channel}) => {
             // # Go to test channel
-            cy.visitAndWait(`/${testTeam.name}/channels/${channel.name}`);
+            cy.visit(`/${testTeam.name}/channels/${channel.name}`);
 
             // # Click the channel header dropdown
             cy.get('#channelHeaderDropdownIcon').click();
@@ -116,7 +116,7 @@ describe('Channels', () => {
             cy.get('#channelHeaderDropdownIcon').click();
 
             // * Channel convert to private should no longer be visible
-            cy.get('#channelConvertToPrivate').should('not.be.visible');
+            cy.get('#channelConvertToPrivate').should('not.exist');
         });
     });
 });
@@ -147,7 +147,7 @@ const removePermission = (permissionCheckBoxTestId) => {
 const resetPermissionsToDefault = () => {
     // # Login as sysadmin and navigate to system scheme page
     cy.apiAdminLogin();
-    cy.visitAndWait('/admin_console/user_management/permissions/system_scheme');
+    cy.visit('/admin_console/user_management/permissions/system_scheme');
 
     // # Click reset to defaults and confirm
     cy.findByTestId('resetPermissionsToDefault').click();

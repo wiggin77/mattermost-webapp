@@ -31,7 +31,7 @@ describe('Notifications', () => {
                 townsquareChannelId = channel.id;
             });
 
-            cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+            cy.visit(`/${testTeam.name}/channels/town-square`);
         });
     });
 
@@ -58,6 +58,6 @@ describe('Notifications', () => {
         cy.findByText('Last Message').should('be.visible');
 
         // * Verify that 'Jump to New Messages' is not visible
-        cy.get('.toast__visible').should('not.be.visible');
+        cy.get('.toast__visible').should('not.exist');
     });
 });

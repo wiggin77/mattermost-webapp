@@ -43,7 +43,7 @@ describe('Plugin Marketplace', () => {
 
             // # Login as non admin user
             cy.apiLogin(regularUser);
-            cy.visitAndWait(townsquareLink);
+            cy.visit(townsquareLink);
 
             // * Verify Plugin Marketplace does not exist
             verifyPluginMarketplaceVisibility(false);
@@ -64,7 +64,7 @@ describe('Plugin Marketplace', () => {
             });
 
             // # Visit town-square channel
-            cy.visitAndWait(townsquareLink);
+            cy.visit(townsquareLink);
 
             // * Verify Plugin Marketplace does not exist
             verifyPluginMarketplaceVisibility(false);
@@ -85,7 +85,7 @@ describe('Plugin Marketplace', () => {
             });
 
             // # Visit town-square channel
-            cy.visitAndWait(townsquareLink);
+            cy.visit(townsquareLink);
 
             // * Verify Plugin Marketplace does not exist
             verifyPluginMarketplaceVisibility(false);
@@ -106,14 +106,14 @@ describe('Plugin Marketplace', () => {
                     MarketplaceUrl: 'https://api.integrations.mattermost.com',
                 },
             });
-            cy.visitAndWait(pluginManagementPage);
+            cy.visit(pluginManagementPage);
 
             cy.wait(TIMEOUTS.HALF_SEC).get('input[data-testid="enablefalse"]').should('be.checked');
             cy.get('input[data-testid="enabletrue"]').check();
             cy.get('#saveSetting').click();
 
             // Verify that the Plugin Marketplace is available
-            cy.visitAndWait(townsquareLink);
+            cy.visit(townsquareLink);
             verifyPluginMarketplaceVisibility(true);
         });
 
@@ -130,14 +130,14 @@ describe('Plugin Marketplace', () => {
                     MarketplaceUrl: 'https://api.integrations.mattermost.com',
                 },
             });
-            cy.visitAndWait(pluginManagementPage);
+            cy.visit(pluginManagementPage);
 
             cy.wait(TIMEOUTS.HALF_SEC).get('input[data-testid="enableMarketplacefalse"]').should('be.checked');
             cy.get('input[data-testid="enableMarketplacetrue"]').check();
             cy.get('#saveSetting').click();
 
             // Verify that the Plugin Marketplace is available
-            cy.visitAndWait(townsquareLink);
+            cy.visit(townsquareLink);
             verifyPluginMarketplaceVisibility(true);
         });
     });
@@ -161,7 +161,7 @@ describe('Plugin Marketplace', () => {
             uninstallAllPlugins();
 
             // # Visit the Town Square channel
-            cy.visitAndWait(townsquareLink);
+            cy.visit(townsquareLink);
 
             cy.wait(TIMEOUTS.HALF_SEC).get('#lhsHeader').should('be.visible').within(() => {
                 // # Click hamburger main menu
@@ -238,7 +238,7 @@ describe('Plugin Marketplace', () => {
             uninstallAllPlugins();
 
             // # Visit the Town Square channel
-            cy.visitAndWait(townsquareLink);
+            cy.visit(townsquareLink);
 
             cy.wait(TIMEOUTS.HALF_SEC).get('#lhsHeader').should('be.visible').within(() => {
                 // # Click hamburger main menu
@@ -252,7 +252,7 @@ describe('Plugin Marketplace', () => {
             });
 
             // * Verify error bar should not be visible
-            cy.get('#error_bar').should('not.be.visible');
+            cy.get('#error_bar').should('not.exist');
 
             // * Verify search should be visible
             cy.findByPlaceholderText('Search Plugins').scrollIntoView().should('be.visible');
@@ -319,7 +319,7 @@ describe('Plugin Marketplace', () => {
             cy.get('#closeIcon').click();
 
             // * Verify marketplace should not be visible
-            cy.get('#modal_marketplace').should('not.be.visible');
+            cy.get('#modal_marketplace').should('not.exist');
         });
 
         it('should filter all on search', () => {
@@ -411,10 +411,10 @@ describe('Plugin Marketplace', () => {
             cy.get('#confirmModal').find('.btn.btn-primary').click();
 
             // * Verify confirmation modal should not be visible
-            cy.get('#confirmModal').should('not.be.visible');
+            cy.get('#confirmModal').should('not.exist');
 
             // * Verify github plugin update prompt should not be visible
-            cy.get('#marketplace-plugin-github').find('.update').should('not.be.visible');
+            cy.get('#marketplace-plugin-github').find('.update').should('not.exist');
 
             // * Verify should show "Configure" after installation
             cy.get('#marketplace-plugin-github').find('.btn.btn-outline', {timeout: TIMEOUTS.ONE_MIN}).scrollIntoView().should('be.visible').and('have.text', 'Configure');
@@ -475,7 +475,7 @@ describe('Plugin Marketplace', () => {
             });
 
             // # Visit town-square channel
-            cy.visitAndWait(townsquareLink);
+            cy.visit(townsquareLink);
 
             // # Click hamburger main menu
             cy.wait(TIMEOUTS.HALF_SEC).get('#sidebarHeaderDropdownButton').click();

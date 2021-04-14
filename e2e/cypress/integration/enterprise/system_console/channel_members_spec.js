@@ -43,21 +43,24 @@ describe('Channel members test', () => {
 
     it('MM-23938 - Channel members block is only visible when channel is not group synced', () => {
         // # Visit the channel page
-        cy.visitAndWait(`/admin_console/user_management/channels/${testChannel.id}`);
+        cy.visit(`/admin_console/user_management/channels/${testChannel.id}`);
 
         // * Assert that the members block is visible on non group synced channel
         cy.get('#channelMembers').scrollIntoView().should('be.visible');
 
         // # Click the sync group members switch
-        cy.findByTestId('syncGroupSwitch').scrollIntoView().click();
+        cy.findByTestId('syncGroupSwitch').
+            scrollIntoView().
+            findByRole('button').
+            click({force: true});
 
         // * Assert that the members block is no longer visible
-        cy.get('#channelMembers').should('not.be.visible');
+        cy.get('#channelMembers').should('not.exist');
     });
 
     it('MM-23938 - Channel Members block can search for users, remove users, add users and modify their roles', () => {
         // # Visit the channel page
-        cy.visitAndWait(`/admin_console/user_management/channels/${testChannel.id}`);
+        cy.visit(`/admin_console/user_management/channels/${testChannel.id}`);
 
         // * Assert that the members block is visible on non group synced team
         cy.get('#channelMembers').scrollIntoView().should('be.visible');
@@ -66,7 +69,7 @@ describe('Channel members test', () => {
         searchFor(user1.email);
 
         // # Wait till loading complete and then remove the only visible user
-        cy.get('#channelMembers .DataGrid_loading').should('not.be.visible');
+        cy.get('#channelMembers .DataGrid_loading').should('not.exist');
         cy.get('#channelMembers .UserGrid_removeRow a').should('be.visible').click();
 
         // # Attempt to save
@@ -82,7 +85,7 @@ describe('Channel members test', () => {
         searchFor(user2.email);
 
         // # Wait till loading complete and then remove the only visible user
-        cy.get('#channelMembers .DataGrid_loading').should('not.be.visible');
+        cy.get('#channelMembers .DataGrid_loading').should('not.exist');
         cy.get('#channelMembers .UserGrid_removeRow a').should('be.visible').click();
 
         // # Attempt to save
@@ -95,10 +98,10 @@ describe('Channel members test', () => {
         cy.get('#confirmModalButton').click();
 
         // # Check that the members block is no longer visible meaning that the save has succeeded and we were redirected out
-        cy.get('#channelMembers').should('not.be.visible');
+        cy.get('#channelMembers').should('not.exist');
 
         // # Visit the channel page
-        cy.visitAndWait(`/admin_console/user_management/channels/${testChannel.id}`);
+        cy.visit(`/admin_console/user_management/channels/${testChannel.id}`);
 
         // # Search for user1 that we know is no longer in the team
         searchFor(user1.email);
@@ -153,11 +156,11 @@ describe('Channel members test', () => {
         saveConfig();
 
         // # Visit the channel page
-        cy.visitAndWait(`/admin_console/user_management/channels/${testChannel.id}`);
+        cy.visit(`/admin_console/user_management/channels/${testChannel.id}`);
 
         // # Search user1 that we know is now in the team again
         searchFor(user1.email);
-        cy.get('#channelMembers .DataGrid_loading').should('not.be.visible');
+        cy.get('#channelMembers .DataGrid_loading').should('not.exist');
 
         // * Assert that the user is now saved as an admin
         cy.get('#channelMembers .DataGrid_rows').children(0).should('contain', user1.email).and('not.contain', 'New').and('contain', 'Channel Admin');
@@ -176,7 +179,7 @@ describe('Channel members test', () => {
 
         // # Search user2 that we know is now in the team again
         searchFor(user2.email);
-        cy.get('#channelMembers .DataGrid_loading').should('not.be.visible');
+        cy.get('#channelMembers .DataGrid_loading').should('not.exist');
 
         // * Assert user2 is now saved as a regular member
         cy.get('#channelMembers .DataGrid_rows').children(0).should('contain', user2.email).and('not.contain', 'New').and('contain', 'Member');
@@ -191,7 +194,7 @@ function saveConfig() {
     cy.get('#saveSetting').click();
 
     // # Check that the members block is no longer visible meaning that the save has succeeded and we were redirected out
-    cy.get('#channelMembers').should('not.be.visible');
+    cy.get('#channelMembers').should('not.exist');
 }
 
 function searchFor(searchTerm) {

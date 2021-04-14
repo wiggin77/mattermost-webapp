@@ -38,8 +38,8 @@ describe('Profile popover', () => {
     beforeEach(() => {
         cy.apiAdminLogin();
         cy.apiResetRoles();
-        cy.visitAndWait('/admin_console/user_management/permissions/system_scheme');
-        cy.get('.admin-console__header', {timeout: TIMEOUTS.ONE_MIN}).should('be.visible').and('have.text', 'System Scheme');
+        cy.visit('/admin_console/user_management/permissions/system_scheme');
+        cy.get('.admin-console__header', {timeout: TIMEOUTS.TWO_MIN}).should('be.visible').and('have.text', 'System Scheme');
     });
 
     it('MM-T2 Add user — Error if already in channel', () => {
@@ -55,7 +55,7 @@ describe('Profile popover', () => {
 
         // # Login as test user and go to town square
         cy.apiLogin(testUser);
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         // # Send multiple messages so that the profile popover appears completely.
         cy.postMessage('Hi there\nsending\na\nmessage');
@@ -63,7 +63,7 @@ describe('Profile popover', () => {
 
         // # Login as the second user now
         cy.apiLogin(otherUser);
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         clickAddToChannel(testUser);
 
@@ -97,7 +97,7 @@ describe('Profile popover', () => {
             privateChannel = channel;
         });
 
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         clickAddToChannel(testUser);
 
@@ -125,7 +125,7 @@ describe('Profile popover', () => {
 
         // # Login as the second user now
         cy.apiLogin(otherUser);
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         clickAddToChannel(testUser);
 
@@ -136,8 +136,8 @@ describe('Profile popover', () => {
             // * And verify that button is disabled
             cy.get('#add-user-to-channel-modal__add-button').should('be.disabled');
 
-            // # Clear text box, type "private" and press enter.
-            cy.get('input').should('be.visible').clear().type('private').wait(TIMEOUTS.HALF_SEC).type('{enter}');
+            // # Clear text box, type "Test Channel" and press enter.
+            cy.get('input').should('be.visible').clear().type('Test Channel').wait(TIMEOUTS.HALF_SEC).type('{enter}');
 
             // * Verify that button is enabled
             cy.get('#add-user-to-channel-modal__add-button').should('not.be.disabled');
@@ -179,7 +179,7 @@ describe('Profile popover', () => {
 
         // # Promote to channel admin
         promoteToChannelOrTeamAdmin(otherUser, testChannel.id);
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         clickAddToChannel(testUser);
 
@@ -204,10 +204,10 @@ describe('Profile popover', () => {
         });
 
         // * Now verify that popup is gone
-        cy.get('div[aria-labelledby="addChannelModalLabel"]').should('not.be.visible');
+        cy.get('div[aria-labelledby="addChannelModalLabel"]').should('not.exist');
 
         // # Visit that channel
-        cy.visitAndWait(`/${testTeam.name}/channels/${testChannel.name}`);
+        cy.visit(`/${testTeam.name}/channels/${testChannel.name}`);
 
         // * Verify that user added message is there.
         cy.findByTestId('postView', {timeout: TIMEOUTS.ONE_MIN}).find('.post-message__text').should('contain.text', `@${testUser.username} added to the channel by you.`);
@@ -255,19 +255,19 @@ describe('Profile popover', () => {
         cy.apiLogin(otherUser);
 
         // # Visit town square
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         clickAddToChannel(testUser);
 
         cy.get('div[aria-labelledby="addChannelModalLabel"]').within(() => {
-            // # Type "Channel" and press enter.
-            cy.get('input').should('be.visible').type('Channel').wait(TIMEOUTS.HALF_SEC).type('{enter}');
+            // # Type "Public" and press enter.
+            cy.get('input').should('be.visible').type('Public').wait(TIMEOUTS.HALF_SEC).type('{enter}');
 
             // * And verify that button is disabled
             cy.get('#add-user-to-channel-modal__add-button').should('be.disabled');
 
-            // # Clear text box, type "private" and press enter.
-            cy.get('input').should('be.visible').clear().type('private').wait(TIMEOUTS.HALF_SEC).type('{enter}');
+            // # Clear text box, type "Test Channel" and press enter.
+            cy.get('input').should('be.visible').clear().type('Test Channel').wait(TIMEOUTS.HALF_SEC).type('{enter}');
 
             // * Verify that button is enabled.
             cy.get('#add-user-to-channel-modal__add-button').should('not.be.disabled');
@@ -277,10 +277,10 @@ describe('Profile popover', () => {
         });
 
         // * Now verify that popup is gone
-        cy.get('div[aria-labelledby="addChannelModalLabel"]').should('not.be.visible');
+        cy.get('div[aria-labelledby="addChannelModalLabel"]').should('not.exist');
 
         // # Visit that channel
-        cy.visitAndWait(`/${testTeam.name}/channels/${privateChannel.name}`);
+        cy.visit(`/${testTeam.name}/channels/${privateChannel.name}`);
 
         // * Verify that user added message is there.
         cy.findByTestId('postView', {timeout: TIMEOUTS.ONE_MIN}).find('.post-message__text').should('contain.text', `@${testUser.username} added to the channel by you.`);
@@ -308,7 +308,7 @@ describe('Profile popover', () => {
         cy.apiLogin(otherUser);
 
         // # Visit town square
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         clickAddToChannel(testUser);
 
@@ -319,8 +319,8 @@ describe('Profile popover', () => {
             // * Verify that button is disabled.
             cy.get('#add-user-to-channel-modal__add-button').should('be.disabled');
 
-            // # Clear text box, type "private" and press enter.
-            cy.get('input').should('be.visible').clear().type('private').wait(TIMEOUTS.HALF_SEC).type('{enter}');
+            // # Clear text box, type "Test Channel" and press enter.
+            cy.get('input').should('be.visible').clear().type('Test Channel').wait(TIMEOUTS.HALF_SEC).type('{enter}');
 
             // * Verify that button is enabled.
             cy.get('#add-user-to-channel-modal__add-button').should('not.be.disabled');
@@ -336,10 +336,10 @@ describe('Profile popover', () => {
         });
 
         // * Now verify that popup is gone
-        cy.get('div[aria-labelledby="addChannelModalLabel"]').should('not.be.visible');
+        cy.get('div[aria-labelledby="addChannelModalLabel"]').should('not.exist');
 
         // # Visit that channel
-        cy.visitAndWait(`/${testTeam.name}/channels/${testChannel.name}`);
+        cy.visit(`/${testTeam.name}/channels/${testChannel.name}`);
 
         // * Verify that there are 2 post views now.
         cy.findAllByTestId('postView', {timeout: TIMEOUTS.ONE_MIN}).should('have.length', 2);
@@ -385,7 +385,7 @@ describe('Profile popover', () => {
 
         // # Login
         cy.apiLogin(otherUser);
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
         verifyAddToChannel(testUser, false);
 
         // # Promote to channel admin
@@ -394,7 +394,7 @@ describe('Profile popover', () => {
         cy.apiLogout();
 
         cy.apiLogin(otherUser);
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
         verifyAddToChannel(testUser, false);
 
         // # Promote to team admin
@@ -403,14 +403,14 @@ describe('Profile popover', () => {
         cy.apiLogout();
 
         cy.apiLogin(otherUser);
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
         verifyAddToChannel(testUser, false);
         cy.apiLogout();
 
         // login as system admin
         cy.apiAdminLogin();
 
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         verifyAddToChannel(testUser);
     });
@@ -449,14 +449,14 @@ const verifyAddToChannel = (user, visible = true) => {
         cy.findByText('Add to a Channel').should('be.visible');
     } else {
         // * Add to a Channel should not be visible
-        cy.findByText('Add to a Channel').should('not.be.visible');
+        cy.findByText('Add to a Channel').should('not.exist');
     }
 };
 
 const clickAddToChannel = (user) => {
     // # Open profile popover
     cy.get('#postListContent', {timeout: TIMEOUTS.ONE_MIN}).within(() => {
-        cy.findAllByText(user.username).first().should('have.text', user.username).click();
+        cy.findAllByText(`${user.username}`).first().should('have.text', user.username).click();
     });
 
     // * Add to a Channel should not be visible

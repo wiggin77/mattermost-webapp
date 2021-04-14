@@ -37,7 +37,7 @@ describe('Main menu', () => {
             } = FixedCloudConfig.SupportSettings;
 
             cy.apiLogin(testUser);
-            cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+            cy.visit(`/${testTeam.name}/channels/town-square`);
             cy.get('#channel-header', {timeout: TIMEOUTS.ONE_MIN}).should('be.visible').within(() => {
                 cy.get('#channelHeaderUserGuideButton').click();
                 cy.get('.dropdown-menu').should('be.visible').within(() => {
@@ -66,14 +66,14 @@ describe('Main menu', () => {
                     EnableAskCommunityLink: false,
                 },
             });
-            cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+            cy.visit(`/${testTeam.name}/channels/town-square`);
 
             cy.get('#channel-header', {timeout: TIMEOUTS.ONE_MIN}).should('be.visible').within(() => {
                 // # Click user help button
                 cy.get('#channelHeaderUserGuideButton').click();
                 cy.get('.dropdown-menu').should('be.visible').within(() => {
                     // * Check that Ask the community button is not visible
-                    cy.get('#askTheCommunityLink').should('be.not.visible');
+                    cy.get('#askTheCommunityLink').should('not.exist');
                     cy.get('#helpResourcesLink').should('be.visible');
                 });
             });
@@ -81,7 +81,7 @@ describe('Main menu', () => {
 
         it('Should have askTheCommunityLink system console setting', () => {
             cy.apiLogin(sysadmin);
-            cy.visitAndWait('/admin_console/site_config/customization');
+            cy.visit('/admin_console/site_config/customization');
 
             cy.get('.admin-console', {timeout: TIMEOUTS.HALF_MIN}).should('be.visible').within(() => {
                 cy.get('.admin-console__header').should('be.visible').and('have.text', 'Customization');

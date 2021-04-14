@@ -35,11 +35,6 @@ describe('System Console - Enterprise', () => {
             url: 'admin_console/user_management/permissions',
         },
         {
-            header: 'Performance Monitoring',
-            sidebar: 'Performance Monitoring',
-            url: 'admin_console/environment/performance_monitoring',
-        },
-        {
             header: 'Announcement Banner',
             sidebar: 'Announcement Banner',
             url: 'admin_console/site_config/announcement_banner',
@@ -55,9 +50,9 @@ describe('System Console - Enterprise', () => {
             url: 'admin_console/authentication/saml',
         },
         {
-            header: 'OAuth 2.0',
-            sidebar: 'OAuth 2.0',
-            url: 'admin_console/authentication/oauth',
+            header: 'OpenID Connect',
+            sidebar: 'OpenID Connect',
+            url: 'admin_console/authentication/openid',
         },
         {
             header: 'Guest Access (Beta)',
@@ -96,7 +91,7 @@ describe('System Console - Enterprise', () => {
         cy.apiUpdateConfig(newSettings);
 
         // # Go to system admin then verify admin console URL and header
-        cy.visitAndWait('/admin_console/about/license');
+        cy.visit('/admin_console/about/license');
         cy.url().should('include', '/admin_console/about/license');
         cy.get('.admin-console', {timeout: TIMEOUTS.HALF_MIN}).should('be.visible').within(() => {
             cy.get('.admin-console__header').should('be.visible').and('have.text', 'Edition and License');

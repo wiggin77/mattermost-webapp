@@ -7,7 +7,6 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
-// Stage: @prod
 // Group: @signin_authentication
 
 import {
@@ -40,7 +39,7 @@ describe('Signin/Authentication', () => {
         });
     });
 
-    it('SA15008 - Sign In Forgot password - Email address has account on server', () => {
+    it('MM-T407 - Sign In Forgot password - Email address has account on server', () => {
         resetPasswordAndLogin(testUser, testTeam, testConfig);
     });
 });
@@ -82,7 +81,7 @@ function resetPasswordAndLogin(user, team, config) {
     const newPassword = 'newpasswd';
 
     // # Visit town-square
-    cy.visitAndWait(`/${team.name}/channels/town-square`);
+    cy.visit(`/${team.name}/channels/town-square`);
 
     // * Verify that it redirects to /login
     cy.url().should('contain', '/login');
@@ -123,7 +122,7 @@ function resetPasswordAndLogin(user, team, config) {
         expect(token.length).to.equal(64);
 
         // # Visit password reset link (e.g. click on email link)
-        cy.visitAndWait(passwordResetLink);
+        cy.visit(passwordResetLink);
         cy.url().should('contain', '/reset_password_complete?token=');
 
         // * Verify that the focus is set to resetPasswordInput

@@ -152,9 +152,13 @@ class Post extends React.PureComponent {
         clearTimeout(this.highlightTimeout);
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
         if (this.state.a11yActive) {
             this.postRef.current.dispatchEvent(new Event(A11yCustomEventTypes.UPDATE));
+        }
+        if (this.props.post.state === Posts.POST_DELETED && prevProps.post.state !== Posts.POST_DELETED) {
+            // ensure deleted message content does not remain in stale aria-label
+            this.updateAriaLabel();
         }
     }
 
@@ -239,9 +243,9 @@ class Post extends React.PureComponent {
             className += ' post--bot';
         }
 
-        let currentUserCss = '';
-        if (this.props.currentUserId === post.user_id && !fromWebhook && !isSystemMessage) {
-            currentUserCss = 'current--user';
+        let userCss = '';
+        if (!fromWebhook && !isSystemMessage) {
+            userCss = 'current--user';
         }
 
         let sameUserClass = '';
@@ -261,7 +265,7 @@ class Post extends React.PureComponent {
         if (isSystemMessage || isMeMessage) {
             className += ' post--system';
             if (isSystemMessage) {
-                currentUserCss = '';
+                userCss = '';
                 postType = '';
                 rootUser = '';
             }
@@ -287,7 +291,7 @@ class Post extends React.PureComponent {
             className += ' cursor--pointer';
         }
 
-        return className + ' ' + sameUserClass + ' ' + rootUser + ' ' + postType + ' ' + currentUserCss;
+        return className + ' ' + sameUserClass + ' ' + rootUser + ' ' + postType + ' ' + userCss;
     }
 
     setHover = () => {
@@ -319,6 +323,10 @@ class Post extends React.PureComponent {
     }
 
     handlePostFocus = () => {
+        this.updateAriaLabel();
+    }
+
+    updateAriaLabel = () => {
         this.setState({currentAriaLabel: this.props.createAriaLabel(this.props.intl)});
     }
 

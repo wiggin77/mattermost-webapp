@@ -37,7 +37,7 @@ describe('Keyboard Shortcuts', () => {
     beforeEach(() => {
         // # Login as admin and visit town-square
         cy.apiAdminLogin();
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
     });
 
     it('MM-T1239 - CTRL+/ and CMD+/ and /shortcuts', () => {
@@ -62,7 +62,7 @@ describe('Keyboard Shortcuts', () => {
 
         // # Type CTRL/CMD+/ to close the 'Keyboard Shortcuts' modal
         cy.get('body').cmdOrCtrlShortcut('/');
-        cy.get('#shortcutsModalLabel').should('not.be.visible');
+        cy.get('#shortcutsModalLabel').should('not.exist');
 
         // # Type /shortcuts
         cy.get('#post_textbox').clear().type('/shortcuts{enter}');
@@ -70,14 +70,14 @@ describe('Keyboard Shortcuts', () => {
 
         // # Close the 'Keyboard Shortcuts' modal using the x button
         cy.get('.modal-header button.close').should('have.attr', 'aria-label', 'Close').click();
-        cy.get('#shortcutsModalLabel').should('not.be.visible');
+        cy.get('#shortcutsModalLabel').should('not.exist');
 
         // # Type /shortcuts
         cy.get('#post_textbox').clear().type('/shortcuts{enter}');
 
         // # Close the 'Keyboard Shortcuts' modal by pressing ESC key
         cy.get('body').type('{esc}');
-        cy.get('#shortcutsModalLabel').should('not.be.visible');
+        cy.get('#shortcutsModalLabel').should('not.exist');
     });
 
     it('MM-T1254 - CTRL/CMD+UP; CTRL/CMD+DOWN', () => {
@@ -216,7 +216,7 @@ describe('Keyboard Shortcuts', () => {
         // Step #1
         cy.apiLogout();
         cy.apiLogin(testUser);
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         for (let index = 0; index < count; index++) {
             teamNames.push('team' + index);
@@ -230,7 +230,7 @@ describe('Keyboard Shortcuts', () => {
                 cy.apiCreateChannel(team.id, channelNames[index], channelDisplayNames[index]).then(({channel}) => {
                     channelNames[index] = channel.name;
                     channelDisplayNames[index] = channel.display_name;
-                    cy.visitAndWait(`/${team.name}/channels/${channel.name}`);
+                    cy.visit(`/${team.name}/channels/${channel.name}`);
                 });
             });
         }

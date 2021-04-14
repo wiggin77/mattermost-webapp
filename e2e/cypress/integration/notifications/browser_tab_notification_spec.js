@@ -44,8 +44,8 @@ describe('Notifications', () => {
 
             // # Remove mention notification (for initial channel).
             cy.apiLogin(user1);
-            cy.visitAndWait(testTeam1TownSquareUrl);
-            cy.get('#publicChannelList').get('.unread-title').click();
+            cy.visit(testTeam1TownSquareUrl);
+            cy.get('#sidebar-left').get('.unread-title').click();
             cy.apiLogout();
         });
     });
@@ -53,26 +53,26 @@ describe('Notifications', () => {
     it('MM-T556 Browser tab and team sidebar notification - no unreads/mentions', () => {
         // # User 1 views team A
         cy.apiLogin(user1);
-        cy.visitAndWait(testTeam1TownSquareUrl);
+        cy.visit(testTeam1TownSquareUrl);
 
         cy.title().should('include', `Town Square - ${team1.display_name} ${siteName}`);
 
         // * Browser tab shows channel name with no unread indicator
-        cy.get(`#${team1.name}TeamButton`).parent('.unread').should('not.be.visible');
-        cy.get('.badge').should('not.be.visible');
+        cy.get(`#${team1.name}TeamButton`).parent('.unread').should('not.exist');
+        cy.get('.badge').should('not.exist');
 
         // * No unread/mention indicator in team sidebar
-        cy.get(`#${team2.name}TeamButton`).parent('.unread').should('not.be.visible');
-        cy.get('.badge').should('not.be.visible');
+        cy.get(`#${team2.name}TeamButton`).parent('.unread').should('not.exist');
+        cy.get('.badge').should('not.exist');
     });
 
     it('MM-T560_1 Browser tab and team sidebar unreads and mentions - Mention in different team', () => {
         // # User 1 views team A
         cy.apiLogin(user1);
-        cy.visitAndWait(testTeam1TownSquareUrl);
+        cy.visit(testTeam1TownSquareUrl);
 
         // # Return to town square
-        cy.visitAndWait(testTeam1TownSquareUrl);
+        cy.visit(testTeam1TownSquareUrl);
 
         // * Check for no unreads or mentions
         cy.get('.unread-title').should('not.exist');
@@ -103,17 +103,17 @@ describe('Notifications', () => {
     it('MM-T560_2 Team sidebar icon - Badge with mention count increments when added to channel', () => {
         // # User 1 view and remain on team A
         cy.apiLogin(user1);
-        cy.visitAndWait(testTeam1TownSquareUrl);
+        cy.visit(testTeam1TownSquareUrl);
 
         // * Browser tab should displays (1) * channel - [team name] Mattermost (for verify count increase)
         cy.title().should('include', `(1) Town Square - ${team1.display_name} ${siteName}`);
 
         // # Have another user view team B
         cy.apiLogin(user2);
-        cy.visitAndWait(testTeam2TownSquareUrl);
+        cy.visit(testTeam2TownSquareUrl);
 
         // # Create a new channel
-        cy.get('#createPublicChannel').should('be.visible').click();
+        cy.uiBrowseOrCreateChannel('Create New Channel').click();
         cy.wait(TIMEOUTS.HALF_SEC);
         cy.get('#newChannelName').should('be.visible').type('new-channel');
         cy.get('#submitNewChannel').click();
@@ -123,7 +123,7 @@ describe('Notifications', () => {
         cy.get('#member_popover').should('be.visible').click();
         cy.contains('Manage Members').click();
         cy.contains('Add Members').click();
-        cy.contains(`${user1.username}`).click();
+        cy.get('.channel-switcher__content input').should('exist').type(`${user1.username}{enter}`);
         cy.get('#saveItems').click();
         cy.wait(TIMEOUTS.HALF_SEC);
 
@@ -135,7 +135,7 @@ describe('Notifications', () => {
         // # Switch to User 1 and visit the town-square
         cy.apiLogout();
         cy.apiLogin(user1);
-        cy.visitAndWait(testTeam1TownSquareUrl);
+        cy.visit(testTeam1TownSquareUrl);
 
         // * Title should be increased
         // * Browser tab should displays (1) * channel - [team name] Mattermost

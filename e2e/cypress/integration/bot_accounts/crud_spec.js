@@ -43,7 +43,7 @@ describe('Bot accounts - CRUD Testing', () => {
 
     it('MM-T1841 Long description text', () => {
         // # Visit the integrations
-        cy.visitAndWait(`/${newTeam.name}/integrations/bots`);
+        cy.visit(`/${newTeam.name}/integrations/bots`);
 
         // * Check that the previously created bot is listed
         cy.findByText(testBot.fullDisplayName).then((el) => {
@@ -82,7 +82,7 @@ describe('Bot accounts - CRUD Testing', () => {
 
     it('MM-T1842 Change BOT role', () => {
         // # Visit the integrations
-        cy.visitAndWait(`/${newTeam.name}/integrations/bots`);
+        cy.visit(`/${newTeam.name}/integrations/bots`);
 
         // * Check that the previously created bot is listed
         cy.findByText(testBot.fullDisplayName).then((el) => {
@@ -131,14 +131,14 @@ describe('Bot accounts - CRUD Testing', () => {
 
                 // * Validate that token is NOT visible on the next page
                 const token = text.substr(text.indexOf('Token: ') + 7, 26);
-                cy.findByText(new RegExp(token)).should('not.be.visible');
+                cy.findByText(new RegExp(token)).should('not.exist');
             });
         });
     });
 
     it('MM-T1845 Create a new token via the UI', () => {
         // # Visit the integrations
-        cy.visitAndWait(`/${newTeam.name}/integrations/bots`);
+        cy.visit(`/${newTeam.name}/integrations/bots`);
 
         // * Check that the previously created bot is listed
         cy.findByText(testBot.fullDisplayName).then((el) => {
@@ -161,7 +161,7 @@ describe('Bot accounts - CRUD Testing', () => {
             // # Save and check that no error is visible
             cy.findByTestId('saveSetting').click();
 
-            cy.get('#clientError').should('not.be.visible');
+            cy.get('#clientError').should('not.exist');
 
             cy.findAllByText(testBot.username + 'description!').should('exist');
         });
@@ -169,7 +169,7 @@ describe('Bot accounts - CRUD Testing', () => {
 
     it('MM-T1848 Delete Token', () => {
         // # Visit the integrations
-        cy.visitAndWait(`/${newTeam.name}/integrations/bots`);
+        cy.visit(`/${newTeam.name}/integrations/bots`);
 
         // * Check that the previously created bot is listed
         cy.findByText(testBot.fullDisplayName).then((el) => {
@@ -200,7 +200,7 @@ describe('Bot accounts - CRUD Testing', () => {
             cy.get('#confirmModalButton').should('be.visible').click();
 
             // * Check that token is not visible
-            cy.wrap(el[0].parentElement.parentElement).findByText(/Token ID:/).should('not.be.visible');
+            cy.wrap(el[0].parentElement.parentElement).findByText(/Token ID:/).should('not.exist');
         });
     });
 });

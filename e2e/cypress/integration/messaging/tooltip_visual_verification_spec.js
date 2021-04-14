@@ -20,7 +20,7 @@ describe('Messaging', () => {
                         cy.apiLogin(testUser);
 
                         // # Start DM with other user
-                        cy.visitAndWait(`/${team.name}/messages/@${otherUser.username}`);
+                        cy.visit(`/${team.name}/messages/@${otherUser.username}`);
 
                         cy.get('#channelIntro').should('be.visible').
                             and('contain', `This is the start of your direct message history with ${otherUser.username}.`);
@@ -50,6 +50,6 @@ describe('Messaging', () => {
         cy.findByText(label).should('be.visible');
 
         cy.get(targetElement).trigger('mouseout', {force: true});
-        cy.findByText(label).should('not.be.visible');
+        cy.findByText(label).should('not.exist');
     }
 });

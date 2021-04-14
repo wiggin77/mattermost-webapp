@@ -25,7 +25,7 @@ function verifyLastPostStyle(expectedSize) {
         const postMessageTextId = `#rhsPostMessageText_${postId}`;
 
         // # Get Each Emoji from Reply Window RHS for the postId
-        cy.get(`#rhsContent ${postMessageTextId} span.emoticon`).each(($el) => {
+        cy.get(`#rhsContainer .post-right__content ${postMessageTextId} span.emoticon`).each(($el) => {
             cy.wrap($el).as('message');
 
             // * Verify the size of the emoji
@@ -38,7 +38,7 @@ describe('Message', () => {
     before(() => {
         // # Login as test user and visit town-square
         cy.apiInitSetup({loginAfter: true}).then(({team}) => {
-            cy.visitAndWait(`/${team.name}/channels/town-square`);
+            cy.visit(`/${team.name}/channels/town-square`);
         });
     });
 

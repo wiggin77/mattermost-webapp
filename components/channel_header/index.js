@@ -4,6 +4,7 @@
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
+
 import {
     favoriteChannel,
     unfavoriteChannel,
@@ -34,10 +35,12 @@ import {openModal, closeModal} from 'actions/views/modals';
 import {
     showFlaggedPosts,
     showPinnedPosts,
+    showChannelFiles,
     showMentions,
     openRHSSearch,
     closeRightHandSide,
 } from 'actions/views/rhs';
+import {makeGetCustomStatus, isCustomStatusEnabled} from 'selectors/views/custom_status';
 import {getIsRhsOpen, getRhsState} from 'selectors/rhs';
 import {isModalOpen} from 'selectors/views/modals';
 import {getAnnouncementBarCount} from 'selectors/views/announcement_bar';
@@ -47,6 +50,7 @@ import ChannelHeader from './channel_header';
 
 function makeMapStateToProps() {
     const doGetProfilesInChannel = makeGetProfilesInChannel();
+    const getCustomStatus = makeGetCustomStatus();
 
     return function mapStateToProps(state) {
         const config = getConfig(state);
@@ -57,13 +61,17 @@ function makeMapStateToProps() {
 
         let dmUser;
         let gmMembers;
+        let customStatus;
         if (channel && channel.type === General.DM_CHANNEL) {
             const dmUserId = getUserIdFromChannelName(user.id, channel.name);
             dmUser = getUser(state, dmUserId);
+            customStatus = dmUser && getCustomStatus(state, dmUser.id);
         } else if (channel && channel.type === General.GM_CHANNEL) {
             gmMembers = doGetProfilesInChannel(state, channel.id, false);
         }
         const stats = getCurrentChannelStats(state) || {member_count: 0, guest_count: 0, pinnedpost_count: 0};
+
+        const showChannelFilesButton = config.FeatureFlagFilesSearch === 'true';
 
         return {
             teamId: getCurrentTeamId(state),
@@ -85,6 +93,9 @@ function makeMapStateToProps() {
             currentRelativeTeamUrl: getCurrentRelativeTeamUrl(state),
             isLegacySidebar: config.EnableLegacySidebar === 'true',
             announcementBarCount: getAnnouncementBarCount(state),
+            customStatus,
+            isCustomStatusEnabled: isCustomStatusEnabled(state),
+            showChannelFilesButton,
         };
     };
 }
@@ -95,6 +106,7 @@ const mapDispatchToProps = (dispatch) => ({
         unfavoriteChannel,
         showFlaggedPosts,
         showPinnedPosts,
+        showChannelFiles,
         showMentions,
         openRHSSearch,
         closeRightHandSide,

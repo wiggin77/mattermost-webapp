@@ -21,7 +21,7 @@ const perPage = 50;
 describe('System Console', () => {
     it('SC18512 List pages of inactive users', () => {
         // # Go to users management page
-        cy.visitAndWait('/admin_console/user_management/users');
+        cy.visit('/admin_console/user_management/users');
 
         // # Select inactive users
         cy.get('#selectUserStatus').select('Inactive');
@@ -41,7 +41,7 @@ describe('System Console', () => {
                     // * - number of users should match the remainder
                     // * - no next button since no more inactive users to load
                     cy.findAllByTestId('userListRow').should('have.length', remainder);
-                    cy.get('#searchableUserListNextBtn').should('not.be.visible');
+                    cy.get('#searchableUserListNextBtn').should('not.exist');
                 } else {
                     // * There are still next page to load, so:
                     // * - number of users should match per page

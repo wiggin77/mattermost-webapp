@@ -15,7 +15,7 @@ describe('Message', () => {
     before(() => {
         // # Create new team and new user and visit Town Square channel
         cy.apiInitSetup({loginAfter: true}).then(({team}) => {
-            cy.visitAndWait(`/${team.name}/channels/town-square`);
+            cy.visit(`/${team.name}/channels/town-square`);
         });
     });
 
@@ -52,6 +52,6 @@ function verifySingleImageThumbnail({mode = null} = {}) {
         cy.get('img[src*="preview"]').should('be.visible');
         cy.findByLabelText('Toggle Embed Visibility').should('exist').and('have.attr', 'data-expanded', 'true').click();
         cy.findByLabelText('Toggle Embed Visibility').should('exist').and('have.attr', 'data-expanded', 'false');
-        cy.get('img[src*="preview"]').should('not.be.visible');
+        cy.get('img[src*="preview"]').should('not.exist');
     });
 }

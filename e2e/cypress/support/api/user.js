@@ -82,7 +82,7 @@ Cypress.Commands.add('apiLogout', () => {
     });
 
     // * Verify logged out
-    cy.visitAndWait('/login?extra=expired').url().should('include', '/login');
+    cy.visit('/login?extra=expired').url().should('include', '/login');
 
     // # Ensure we clear out these specific cookies
     ['MMAUTHTOKEN', 'MMUSERID', 'MMCSRF'].forEach((cookie) => {
@@ -113,10 +113,13 @@ Cypress.Commands.add('apiGetUserByEmail', (email, failOnStatusCode = true) => {
         url: '/api/v4/users/email/' + email,
         failOnStatusCode,
     }).then((response) => {
+        const {body, status} = response;
+
         if (failOnStatusCode) {
-            expect(response.status).to.equal(200);
+            expect(status).to.equal(200);
+            return cy.wrap({user: body});
         }
-        return cy.wrap({user: response.body});
+        return cy.wrap({user: status === 200 ? body : null});
     });
 });
 
@@ -188,7 +191,7 @@ Cypress.Commands.add('apiCreateAdmin', () => {
     return cy.request(options).then((res) => {
         expect(res.status).to.equal(201);
 
-        return cy.wrap({sysadmin: res.body});
+        return cy.wrap({sysadmin: {...res.body, password}});
     });
 });
 

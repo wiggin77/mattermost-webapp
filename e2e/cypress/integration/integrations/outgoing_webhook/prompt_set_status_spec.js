@@ -31,7 +31,7 @@ describe('Prompting set status', () => {
 
     it('MM-T673 Prompting to set status to online', () => {
         cy.apiLogin(user1);
-        cy.visitAndWait(testChannelUrl);
+        cy.visit(testChannelUrl);
         cy.get('img.Avatar').click();
         cy.findByText('Online').click();
 
@@ -41,19 +41,19 @@ describe('Prompting set status', () => {
 
         // * Your status stays offline in your view
         cy.get('.offline--icon').should('be.visible');
-        cy.get('.online--icon').should('not.be.visible');
+        cy.get('.online--icon').should('not.exist');
 
         // # Log out
         cy.apiLogout();
 
         cy.apiLogin(user2);
-        cy.visitAndWait(testChannelUrl);
+        cy.visit(testChannelUrl);
         openDM(user1.username);
 
         // * Your status stays offline in other users' views.
         cy.get('#channelHeaderInfo').within(() => {
             cy.get('.offline--icon').should('be.visible');
-            cy.get('.online--icon').should('not.be.visible');
+            cy.get('.online--icon').should('not.exist');
             cy.findByText('Offline').should('be.visible');
         });
         cy.apiGetUserStatus(`${user1.id}`).then((result) => {
@@ -62,7 +62,7 @@ describe('Prompting set status', () => {
 
         // # Log back in
         cy.apiLogin(user1);
-        cy.visitAndWait(testChannelUrl);
+        cy.visit(testChannelUrl);
 
         // # On modal that asks if you want to be set Online, select No.
         cy.get('.modal-content').within(() => {
@@ -72,17 +72,17 @@ describe('Prompting set status', () => {
 
         // * Your status stays offline in your view
         cy.get('.offline--icon').should('be.visible');
-        cy.get('.online--icon').should('not.be.visible');
+        cy.get('.online--icon').should('not.exist');
 
         // * Your status stays offline in other users' views.
         cy.apiLogin(user2);
-        cy.visitAndWait(testChannelUrl);
+        cy.visit(testChannelUrl);
         openDM(user1.username);
 
         // * Your status stays offline in other users' views.
         cy.get('#channelHeaderInfo').within(() => {
             cy.get('.offline--icon').should('be.visible');
-            cy.get('.online--icon').should('not.be.visible');
+            cy.get('.online--icon').should('not.exist');
             cy.findByText('Offline').should('be.visible');
         });
         cy.apiGetUserStatus(`${user1.id}`).then((result) => {
@@ -93,7 +93,7 @@ describe('Prompting set status', () => {
 
 const openDM = (username) => {
     // # Click '+' to open DM and wait for some time to get the DM modal fully loaded
-    cy.get('#addDirectChannel').click().wait(TIMEOUTS.TWO_SEC);
+    cy.uiAddDirectMessage().click().wait(TIMEOUTS.TWO_SEC);
 
     // # Type username and wait for some time to load users list
     cy.get('#selectItems').should('be.visible').type(`${username}`).wait(TIMEOUTS.TWO_SEC);

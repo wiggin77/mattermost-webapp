@@ -17,9 +17,11 @@ describe('Bot accounts ownership and API', () => {
 
     before(() => {
         cy.shouldNotRunOnCloudEdition();
-        cy.apiAdminLogin();
 
-        cy.apiInitSetup().then(({team}) => {
+        cy.apiInitSetup({
+            promoteNewUserAsAdmin: true,
+            loginAfter: true,
+        }).then(({team}) => {
             newTeam = team;
         });
 
@@ -48,7 +50,7 @@ describe('Bot accounts ownership and API', () => {
                 cy.apiDeactivateUser(sysadmin.id);
 
                 // # Get bot list
-                cy.visitAndWait(`/${newTeam.name}/integrations/bots`);
+                cy.visit(`/${newTeam.name}/integrations/bots`);
 
                 // # Search for the other bot
                 cy.get('#searchInput', {timeout: TIMEOUTS.ONE_MIN}).type(bot.username);
@@ -62,7 +64,7 @@ describe('Bot accounts ownership and API', () => {
                 // # Repeat the test to confirm it stays disabled
 
                 // # Get bot list
-                cy.visitAndWait(`/${newTeam.name}/integrations/bots`);
+                cy.visit(`/${newTeam.name}/integrations/bots`);
 
                 // # Search for the other bot
                 cy.get('#searchInput', {timeout: TIMEOUTS.ONE_MIN}).type(bot.username);

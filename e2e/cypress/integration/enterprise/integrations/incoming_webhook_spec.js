@@ -7,7 +7,8 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
-// Group: @enterprise @incoming_webhook
+// Stage: @prod
+// Group: @enterprise @incoming_webhook @not_cloud
 
 import * as TIMEOUTS from '../../../fixtures/timeouts';
 import {
@@ -20,6 +21,8 @@ describe('Incoming webhook', () => {
     let incomingWebhook;
 
     before(() => {
+        cy.shouldNotRunOnCloudEdition();
+
         // # Create and visit new channel and create incoming webhook
         cy.apiInitSetup().then(({team, channel}) => {
             testTeam = team;
@@ -54,7 +57,7 @@ describe('Incoming webhook', () => {
             }],
         };
 
-        cy.visitAndWait(`/${testTeam.name}/channels/${testChannel.name}`);
+        cy.visit(`/${testTeam.name}/channels/${testChannel.name}`);
 
         cy.postIncomingWebhook({url: incomingWebhook.url, data: payload});
 

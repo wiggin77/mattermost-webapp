@@ -9,6 +9,7 @@
 
 // Group: @enterprise @integrations
 
+import {getRandomId} from '../../../utils';
 import {checkboxesTitleToIdMap} from '../../enterprise/system_console/channel_moderation/constants';
 
 import {
@@ -18,11 +19,14 @@ import {
 } from '../../enterprise/system_console/channel_moderation/helpers';
 
 describe('Integrations page', () => {
+    const webhookBaseUrl = Cypress.env('webhookBaseUrl');
+
     let user1;
     let user2;
     let testChannelUrl1;
     let oauthClientID;
     let oauthClientSecret;
+    const testApp = `Test${getRandomId()}`;
 
     before(() => {
         cy.apiRequireLicense();
@@ -53,7 +57,7 @@ describe('Integrations page', () => {
 
     it('MM-T646 OAuth 2.0 trusted', () => {
         cy.apiLogin(user1);
-        cy.visitAndWait(testChannelUrl1);
+        cy.visit(testChannelUrl1);
 
         // # Navigate to OAuthApps in integrations menu
         cy.get('#headerInfo').click();
@@ -72,7 +76,7 @@ describe('Integrations page', () => {
 
     it('MM-T647 Copy icon for OAuth 2.0 Applications', () => {
         cy.apiLogin(user1);
-        cy.visitAndWait(testChannelUrl1);
+        cy.visit(testChannelUrl1);
 
         // # Navigate to OAuthApps in integrations menu
         cy.get('#headerInfo').click();
@@ -83,8 +87,9 @@ describe('Integrations page', () => {
         cy.get('#addOauthApp').click();
 
         // # Fill all fields
-        cy.get('#name').type('Test');
-        cy.get('#description').type('Test');
+        const randomApp = `Random${getRandomId()}`;
+        cy.get('#name').type(randomApp);
+        cy.get('#description').type(randomApp);
         cy.get('#homepage').type('https://www.test.com/');
         cy.get('#callbackUrls').type('https://www.test.com/');
 
@@ -137,7 +142,7 @@ describe('Integrations page', () => {
 
     it('MM-T648_1 OAuth 2.0 Application - Setup', () => {
         cy.apiLogin(user1);
-        cy.visitAndWait(testChannelUrl1);
+        cy.visit(testChannelUrl1);
 
         // # Navigate to OAuthApps in integrations menu
         cy.get('#headerInfo').click();
@@ -148,10 +153,10 @@ describe('Integrations page', () => {
         cy.get('#addOauthApp').click();
 
         // # Fill all fields
-        cy.get('#name').type('Test');
-        cy.get('#description').type('Test');
+        cy.get('#name').type(testApp);
+        cy.get('#description').type(testApp);
         cy.get('#homepage').type('https://www.test.com/');
-        cy.get('#callbackUrls').type(getWebhookBaseUrl() + '/complete_oauth');
+        cy.get('#callbackUrls').type(`${webhookBaseUrl}/complete_oauth`);
 
         // # Save
         cy.get('#saveOauthApp').click();
@@ -175,7 +180,12 @@ describe('Integrations page', () => {
                 oauthClientSecret = clientSecret;
 
                 // # Send credentials
-                cy.postIncomingWebhook({url: getWebhookBaseUrl() + '/send_oauth_credentials', data: {appID: clientID, appSecret: clientSecret}});
+                cy.postIncomingWebhook({
+                    url: `${webhookBaseUrl}/send_oauth_credentials`,
+                    data: {
+                        appID: clientID,
+                        appSecret: clientSecret,
+                    }});
             });
         });
 
@@ -187,24 +197,29 @@ describe('Integrations page', () => {
         cy.apiLogin(user1);
 
         // # Visit the webhook url to start the OAuth handshake
-        cy.visitAndWait(getWebhookBaseUrl() + '/start_oauth');
+        cy.visit(`${webhookBaseUrl}/start_oauth`);
 
         // # Click on the allow button
         cy.findByText('Allow').click();
 
-        // * Exchange succesfull
+        // * Exchange successful
         cy.findByText('OK').should('exist');
     });
 
     it('MM-T648_3 OAuth 2.0 Application - Post message using OAuth credentials', () => {
         // # Visit a channel
-        cy.visitAndWait(testChannelUrl1);
+        cy.visit(testChannelUrl1);
 
         cy.getCurrentChannelId().then((channelId) => {
             const message = 'OAuth test 01';
 
             // # Post message using OAuth credentials
-            cy.postIncomingWebhook({url: getWebhookBaseUrl() + '/postOAuthMessage', data: {channelId, message}});
+            cy.postIncomingWebhook({
+                url: `${webhookBaseUrl}/post_oauth_message`,
+                data: {
+                    channelId,
+                    message,
+                }});
 
             // * The message should be posted
             cy.findByText(message).should('exist');
@@ -213,7 +228,7 @@ describe('Integrations page', () => {
 
     it('MM-T649 Edit Oauth 2.0 Application', () => {
         cy.apiLogin(user2);
-        cy.visitAndWait(testChannelUrl1);
+        cy.visit(testChannelUrl1);
 
         // # Navigate to OAuthApps in integrations menu
         cy.get('#headerInfo').click();
@@ -225,7 +240,7 @@ describe('Integrations page', () => {
 
         // # Login as sysadmin
         cy.apiAdminLogin();
-        cy.visitAndWait(testChannelUrl1);
+        cy.visit(testChannelUrl1);
 
         // # Navigate to OAuthApps in integrations menu
         cy.get('#headerInfo').click();
@@ -247,17 +262,22 @@ describe('Integrations page', () => {
 
         cy.contains('.item-details', oauthClientID).should('exist').within(() => {
             // * Description should be edited
-            cy.findByText('TestEdited').should('exist');
+            cy.findByText(`${testApp}Edited`).should('exist');
         });
 
         // # Visit a channel
-        cy.visitAndWait(testChannelUrl1);
+        cy.visit(testChannelUrl1);
 
         cy.getCurrentChannelId().then((channelId) => {
             const message = 'OAuth test 02';
 
             // # Post message using OAuth credentials
-            cy.postIncomingWebhook({url: getWebhookBaseUrl() + '/postOAuthMessage', data: {channelId, message}});
+            cy.postIncomingWebhook({
+                url: `${webhookBaseUrl}/post_oauth_message`,
+                data: {
+                    channelId,
+                    message,
+                }});
 
             // * The message should be posted
             cy.findByText(message).should('exist');
@@ -266,7 +286,7 @@ describe('Integrations page', () => {
 
     it('MM-T650 Deauthorize OAuth 2.0 Application', () => {
         cy.apiLogin(user1);
-        cy.visitAndWait(testChannelUrl1);
+        cy.visit(testChannelUrl1);
 
         // # Go to OAuth apps settings
         cy.get('#headerInfo').click();
@@ -290,7 +310,12 @@ describe('Integrations page', () => {
             const message = 'OAuth test 03';
 
             // # Post message using OAuth credentials
-            cy.postIncomingWebhook({url: getWebhookBaseUrl() + '/postOAuthMessage', data: {channelId, message}});
+            cy.postIncomingWebhook({
+                url: `${webhookBaseUrl}/post_oauth_message`,
+                data: {
+                    channelId,
+                    message,
+                }});
 
             // * The message should not be posted
             cy.findByText(message).should('not.exist');
@@ -301,12 +326,12 @@ describe('Integrations page', () => {
         cy.apiLogin(user1);
 
         // # Visit the webhook url to start the OAuth handshake
-        cy.visitAndWait(getWebhookBaseUrl() + '/start_oauth');
+        cy.visit(`${webhookBaseUrl}/start_oauth`);
 
         // # Click on the allow button
         cy.findByText('Allow').click();
 
-        // * Exchange succesfull
+        // * Exchange successful
         cy.findByText('OK').should('exist');
     });
 
@@ -314,13 +339,18 @@ describe('Integrations page', () => {
         cy.apiLogin(user1);
 
         // # Visit a channel
-        cy.visitAndWait(testChannelUrl1);
+        cy.visit(testChannelUrl1);
 
         cy.getCurrentChannelId().then((channelId) => {
             const message = 'OAuth test 04';
 
             // # Post message using OAuth credentials
-            cy.postIncomingWebhook({url: getWebhookBaseUrl() + '/postOAuthMessage', data: {channelId, message}});
+            cy.postIncomingWebhook({
+                url: `${webhookBaseUrl}/post_oauth_message`,
+                data: {
+                    channelId,
+                    message,
+                }});
 
             // * The message should be posted
             cy.findByText(message).should('exist');
@@ -329,7 +359,7 @@ describe('Integrations page', () => {
 
     it('MM-T652 Regenerate Secret', () => {
         cy.apiLogin(user1);
-        cy.visitAndWait(testChannelUrl1);
+        cy.visit(testChannelUrl1);
 
         // # Navigate to OAuthApps in integrations menu
         cy.get('#headerInfo').click();
@@ -351,13 +381,18 @@ describe('Integrations page', () => {
         });
 
         // # Visit a channel
-        cy.visitAndWait(testChannelUrl1);
+        cy.visit(testChannelUrl1);
 
         cy.getCurrentChannelId().then((channelId) => {
             const message = 'OAuth test 05';
 
             // # Post message using OAuth credentials
-            cy.postIncomingWebhook({url: getWebhookBaseUrl() + '/postOAuthMessage', data: {channelId, message}});
+            cy.postIncomingWebhook({
+                url: `${webhookBaseUrl}/post_oauth_message`,
+                data: {
+                    channelId,
+                    message,
+                }});
 
             // * The message should be posted
             cy.findByText(message).should('exist');
@@ -368,7 +403,7 @@ describe('Integrations page', () => {
         cy.apiLogin(user2);
 
         // # Visit the webhook url to start the OAuth handshake
-        cy.visitAndWait(getWebhookBaseUrl() + '/start_oauth', {failOnStatusCode: false});
+        cy.visit(`${webhookBaseUrl}/start_oauth`, {failOnStatusCode: false});
 
         // # Click on the allow button
         cy.findByText('Allow').click();
@@ -381,10 +416,15 @@ describe('Integrations page', () => {
         cy.apiAdminLogin(user2);
 
         // # Send new credentials
-        cy.postIncomingWebhook({url: getWebhookBaseUrl() + '/send_oauth_credentials', data: {appID: oauthClientID, appSecret: oauthClientSecret}});
+        cy.postIncomingWebhook({
+            url: `${webhookBaseUrl}/send_oauth_credentials`,
+            data: {
+                appID: oauthClientID,
+                appSecret: oauthClientSecret,
+            }});
 
         // # Visit the webhook url to start the OAuth handshake
-        cy.visitAndWait(getWebhookBaseUrl() + '/start_oauth', {failOnStatusCode: false});
+        cy.visit(`${webhookBaseUrl}/start_oauth`, {failOnStatusCode: false});
 
         // # Click on the allow button
         cy.findByText('Allow').click();
@@ -395,7 +435,7 @@ describe('Integrations page', () => {
 
     it('MM-T655 Delete OAuth 2.0 Application', () => {
         cy.apiLogin(user1);
-        cy.visitAndWait(testChannelUrl1);
+        cy.visit(testChannelUrl1);
 
         // # Navigate to OAuthApps in integrations menu
         cy.get('#headerInfo').click();
@@ -411,19 +451,20 @@ describe('Integrations page', () => {
         cy.contains('#confirmModalButton', 'Delete').click();
 
         // # Go back to channels
-        cy.visitAndWait(testChannelUrl1);
+        cy.visit(testChannelUrl1);
         cy.getCurrentChannelId().then((channelId) => {
             const message = 'OAuth test 06';
 
             // # Post message using OAuth credentials
-            cy.postIncomingWebhook({url: getWebhookBaseUrl() + '/postOAuthMessage', data: {channelId, message}});
+            cy.postIncomingWebhook({
+                url: `${webhookBaseUrl}/post_oauth_message`,
+                data: {
+                    channelId,
+                    message,
+                }});
 
             // * The message should not be posted
             cy.findByText(message).should('not.exist');
         });
     });
 });
-
-function getWebhookBaseUrl() {
-    return Cypress.env('webhookBaseUrl');
-}

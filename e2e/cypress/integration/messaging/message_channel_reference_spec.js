@@ -16,7 +16,7 @@ describe('Messaging', () => {
     before(() => {
         // # Login as test user and visit town-square
         cy.apiInitSetup({loginAfter: true}).then(({team}) => {
-            cy.visitAndWait(`/${team.name}/channels/town-square`);
+            cy.visit(`/${team.name}/channels/town-square`);
         });
     });
 
@@ -39,7 +39,7 @@ describe('Messaging', () => {
         cy.get('#edit_textbox').type('{home}{rightarrow}{backspace}');
 
         // * autocomplete closes
-        cy.get('#suggestionList').should('not.be.visible');
+        cy.get('#suggestionList').should('not.exist');
 
         // close the edit modal
         cy.get('#editButton').click();

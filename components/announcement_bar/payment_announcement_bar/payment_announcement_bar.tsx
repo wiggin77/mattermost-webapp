@@ -3,8 +3,9 @@
 
 import React from 'react';
 
-import {CloudCustomer, Subscription} from 'mattermost-redux/types/cloud';
 import {isEmpty} from 'lodash';
+
+import {CloudCustomer, Subscription} from 'mattermost-redux/types/cloud';
 
 import {browserHistory} from 'utils/browser_history';
 import {isCustomerCardExpired} from 'utils/cloud_utils';
@@ -78,7 +79,7 @@ class PaymentAnnouncementBar extends React.PureComponent<Props> {
 
         return (
             <AnnouncementBar
-                type={AnnouncementBarTypes.CRITICAL_LIGHT}
+                type={AnnouncementBarTypes.CRITICAL}
                 showCloseButton={false}
                 onButtonClick={this.updatePaymentInfo}
                 modalButtonText={t('admin.billing.subscription.updatePaymentInfo')}

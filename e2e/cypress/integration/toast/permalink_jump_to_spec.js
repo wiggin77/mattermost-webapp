@@ -7,7 +7,6 @@
 // Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
-// Stage: @prod
 // Group: @toast
 
 describe('Toast', () => {
@@ -21,7 +20,7 @@ describe('Toast', () => {
     });
 
     it('MM-T1791 Permalink \'Jump to\' in Search', () => {
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
 
         // # Search for a term e.g.test
         const searchTerm = 'test';

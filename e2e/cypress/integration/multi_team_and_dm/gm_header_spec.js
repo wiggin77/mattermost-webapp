@@ -7,6 +7,9 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
+// Stage: @prod
+// Group: @multi_team_and_dm
+
 import {beRead, beUnread} from '../../support/assertions';
 import * as TIMEOUTS from '../../fixtures/timeouts';
 
@@ -42,19 +45,19 @@ describe('Multi-user group header', () => {
 
     it('MM-T472 Add a channel header to a GM', () => {
         cy.apiLogin(testUser);
-        cy.visitAndWait(`/${testTeam.name}/channels/${groupChannel.name}`);
+        cy.visit(`/${testTeam.name}/channels/${groupChannel.name}`);
 
         // * no channel description is set
         cy.contains('#channelHeaderDescription button span', 'Add a channel description').should('be.visible');
 
         // # click add a channel description
-        cy.get('#channelHeaderDescription button').click();
+        cy.findByRoleExtended('button', {name: 'Add a channel description'}).should('be.visible').click();
 
         // # type a header
         const header = 'this is a header!';
         cy.get('#editChannelHeaderModalLabel').should('be.visible').wait(TIMEOUTS.ONE_SEC);
         cy.get('textarea#edit_textbox').should('be.visible').type(`${header}{enter}`);
-        cy.get('#editChannelHeaderModalLabel').should('not.be.visible'); // wait for modal to disappear
+        cy.get('#editChannelHeaderModalLabel').should('not.exist'); // wait for modal to disappear
 
         // * text appears in the top center panel
         cy.contains('#channelHeaderDescription span.header-description__text p', header);
@@ -67,7 +70,7 @@ describe('Multi-user group header', () => {
         // * channel is marked as unread for other user
         cy.apiLogout();
         cy.apiLogin(userList[0]);
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
         cy.get(`#sidebarItem_${groupChannel.name}`).should(beUnread);
         cy.apiLogout();
     });
@@ -75,10 +78,10 @@ describe('Multi-user group header', () => {
     it('MM-T473_1 Edit GM channel header (1/2)', () => {
         // # open existing GM
         cy.apiLogin(testUser);
-        cy.visitAndWait(`/${testTeam.name}/channels/${groupChannel.name}`);
+        cy.visit(`/${testTeam.name}/channels/${groupChannel.name}`);
 
         // * verify header is set
-        cy.contains('#channelHeaderDescription button span', 'Add a channel description').should('not.be.visible');
+        cy.contains('#channelHeaderDescription button span', 'Add a channel description').should('not.exist');
 
         const header = 'this is a new header!';
         editHeader(header);
@@ -91,7 +94,7 @@ describe('Multi-user group header', () => {
         // * channel is marked as unread for other users
         cy.apiLogout();
         cy.apiLogin(userList[0]);
-        cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+        cy.visit(`/${testTeam.name}/channels/town-square`);
         cy.get(`#sidebarItem_${groupChannel.name}`).should(beUnread);
         cy.apiLogout();
     });
@@ -99,10 +102,10 @@ describe('Multi-user group header', () => {
     it('MM-T473_2 Edit GM channel header (2/2)', () => {
         // # open existing GM
         cy.apiLogin(testUser);
-        cy.visitAndWait(`/${testTeam.name}/channels/${groupChannel.name}`);
+        cy.visit(`/${testTeam.name}/channels/${groupChannel.name}`);
 
         // * verify header is set
-        cy.contains('#channelHeaderDescription button span', 'Add a channel description').should('not.be.visible');
+        cy.contains('#channelHeaderDescription button span', 'Add a channel description').should('not.exist');
 
         const header = `Header by @${testUser.username}`;
         editHeader(header);

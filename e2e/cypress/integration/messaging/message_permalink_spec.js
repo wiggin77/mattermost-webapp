@@ -37,7 +37,7 @@ describe('Message permalink', () => {
     });
 
     beforeEach(() => {
-        cy.visitAndWait(`/${testTeam.name}/messages/@${otherUser.username}`);
+        cy.visit(`/${testTeam.name}/messages/@${otherUser.username}`);
     });
 
     it('MM-T177 Copy a permalink and paste into another channel', () => {
@@ -49,7 +49,7 @@ describe('Message permalink', () => {
             const permalink = `${Cypress.config('baseUrl')}/${testTeam.name}/pl/${postId}`;
 
             // # Check if ... button is visible in last post right side
-            cy.get(`#CENTER_button_${postId}`).should('not.be.visible');
+            cy.get(`#CENTER_button_${postId}`).should('not.exist');
 
             // # Click on ... button of last post
             cy.clickPostDotMenu(postId);
@@ -73,7 +73,7 @@ describe('Message permalink', () => {
 
         cy.getLastPostId().then((postId) => {
             const link = `/${testTeam.name}/messages/@${otherUser.username}/${postId}`;
-            cy.visitAndWait(link);
+            cy.visit(link);
             cy.url().should('include', link);
             cy.get(`#post_${postId}`, {timeout: TIMEOUTS.HALF_MIN}).should('have.class', 'post--highlight');
             cy.clock();

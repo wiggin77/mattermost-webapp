@@ -8,6 +8,7 @@
 // ***************************************************************
 
 // Stage: @prod
+// Group: @not_cloud
 
 import * as TIMEOUTS from '../../fixtures/timeouts';
 
@@ -17,6 +18,7 @@ describe('Environment', () => {
 
     const mattermostIcon = 'mattermost-icon_128x128.png';
     before(() => {
+        cy.shouldNotRunOnCloudEdition();
         cy.apiInitSetup().then(({team}) => {
             testTeam = team;
             townsquareLink = `/${team.name}/channels/town-square`;
@@ -24,16 +26,16 @@ describe('Environment', () => {
     });
 
     it('MM-T959 - Web server mode - Webserver gzip', () => {
-        cy.visitAndWait('/admin_console/environment/web_server');
+        cy.visit('/admin_console/environment/web_server');
 
         // # Click dropdown to open selection
         cy.findByTestId('ServiceSettings.WebserverModedropdown').select('gzip');
 
         // # Click Save button to save the settings
-        cy.get('#saveSetting').click();
+        cy.get('#saveSetting').click().wait(TIMEOUTS.ONE_SEC);
 
         // # Navigate to a channel
-        cy.visitAndWait(townsquareLink);
+        cy.visit(townsquareLink);
 
         cy.get('.sidebar-header-dropdown__icon').click();
         cy.findByText('Team Settings').should('be.visible').click();
@@ -76,16 +78,16 @@ describe('Environment', () => {
     });
 
     it('MM-T960 - Web server mode - Webserver Uncompressed', () => {
-        cy.visitAndWait('/admin_console/environment/web_server');
+        cy.visit('/admin_console/environment/web_server');
 
         // # Click dropdown to open selection
         cy.findByTestId('ServiceSettings.WebserverModedropdown').select('Uncompressed');
 
         // # Click Save button to save the settings
-        cy.get('#saveSetting').click();
+        cy.get('#saveSetting').click().wait(TIMEOUTS.ONE_SEC);
 
         // # Navigate to a channel
-        cy.visitAndWait(townsquareLink);
+        cy.visit(townsquareLink);
 
         cy.get('.sidebar-header-dropdown__icon').click();
         cy.findByText('Team Settings').should('be.visible').click();
@@ -128,16 +130,16 @@ describe('Environment', () => {
     });
 
     it('MM-T961 - Web server mode - Webserver Disabled', () => {
-        cy.visitAndWait('/admin_console/environment/web_server');
+        cy.visit('/admin_console/environment/web_server');
 
         // # Click dropdown to open selection
         cy.findByTestId('ServiceSettings.WebserverModedropdown').select('Disabled');
 
         // # Click Save button to save the settings
-        cy.get('#saveSetting').click();
+        cy.get('#saveSetting').click().wait(TIMEOUTS.ONE_SEC);
 
         // # Navigate to a channel
-        cy.visitAndWait(townsquareLink);
+        cy.visit(townsquareLink);
 
         cy.get('.sidebar-header-dropdown__icon').click();
         cy.findByText('Team Settings').should('be.visible').click();
@@ -180,7 +182,7 @@ describe('Environment', () => {
     });
 
     it('MM-T991 - Database fields can be edited and saved', () => {
-        cy.visitAndWait('/admin_console/environment/database');
+        cy.visit('/admin_console/environment/database');
 
         const queryTimeoutValue = 100;
         const maxOpenConnsValue = 1000;
@@ -188,7 +190,7 @@ describe('Environment', () => {
         cy.findByTestId('maxOpenConnsinput').clear().type(maxOpenConnsValue);
 
         // # Click Save button to save the settings
-        cy.get('#saveSetting').click();
+        cy.get('#saveSetting').click().wait(TIMEOUTS.ONE_SEC);
 
         // Get config again
         cy.apiGetConfig().then(({config}) => {
@@ -199,37 +201,31 @@ describe('Environment', () => {
     });
 
     it('MM-T993 - Minimum hashtag length at least 2', () => {
-        cy.visitAndWait('/admin_console/environment/database');
+        const defaultHashtagLength = 3;
+        const minimumHashtagLength = 2;
 
-        const minimumHashtagOrig = 3;
-        const minimumHashtagLength1 = 2;
-        const minimumHashtagLength2 = 1;
+        function setAndVerifyHashtagLength(length) {
+            cy.findByTestId('minimumHashtagLengthinput').clear().type(length);
 
-        cy.findByTestId('minimumHashtagLengthinput').clear().type(minimumHashtagLength1);
+            // # Click Save button to save the settings
+            cy.get('#saveSetting').click({force: true}).wait(TIMEOUTS.ONE_SEC);
 
-        // # Click Save button to save the settings
-        cy.get('#saveSetting').click();
+            // * Verify saved config value
+            cy.apiGetConfig().then(({config}) => {
+                const expectedLength = length < minimumHashtagLength ? defaultHashtagLength : length;
+                expect(config.ServiceSettings.MinimumHashtagLength).to.eq(expectedLength);
+            });
+        }
 
-        // Get config again
-        cy.apiGetConfig().then(({config}) => {
-            // * Verify the database setting value is saved
-            expect(config.ServiceSettings.MinimumHashtagLength).to.eq(minimumHashtagLength1);
-        });
+        cy.visit('/admin_console/environment/database');
 
-        cy.findByTestId('minimumHashtagLengthinput').clear().type(minimumHashtagLength2);
-
-        // # Click Save button to save the settings
-        cy.get('#saveSetting').click();
-
-        // Get config again
-        cy.apiGetConfig().then(({config}) => {
-            // * Verify the database setting value is reset to original value
-            expect(config.ServiceSettings.MinimumHashtagLength).to.eq(minimumHashtagOrig);
-        });
+        setAndVerifyHashtagLength(4);
+        setAndVerifyHashtagLength(1);
+        setAndVerifyHashtagLength(2);
     });
 
     it('MM-T995 - Amazon S3 settings', () => {
-        cy.visitAndWait('/admin_console/environment/file_storage');
+        cy.visit('/admin_console/environment/file_storage');
 
         // # CLick dropdown to open selection
         cy.findByTestId('FileSettings.DriverNamedropdown').select('Amazon S3');
@@ -246,11 +242,12 @@ describe('Environment', () => {
 
         const amazonS3BucketName = 'test';
         const amazonS3PathPrefix = 'test';
+        cy.findByTestId('FileSettings.MaxFileSizenumber').clear().type(52428800);
         cy.findByTestId('FileSettings.AmazonS3Bucketinput').clear().type(amazonS3BucketName);
         cy.findByTestId('FileSettings.AmazonS3PathPrefixinput').clear().type(amazonS3PathPrefix);
 
         // # Click Save button to save the settings
-        cy.get('#saveSetting').click().wait(TIMEOUTS.HALF_MIN);
+        cy.get('#saveSetting').click().wait(TIMEOUTS.ONE_SEC);
 
         // Get config again
         cy.apiGetConfig().then(({config}) => {
@@ -261,7 +258,7 @@ describe('Environment', () => {
     });
 
     it('MM-T996 - Amazon S3 connection error messaging', () => {
-        cy.visitAndWait('/admin_console/environment/file_storage');
+        cy.visit('/admin_console/environment/file_storage');
 
         // # CLick dropdown to open selection
         cy.findByTestId('FileSettings.DriverNamedropdown').select('Amazon S3');
@@ -271,7 +268,7 @@ describe('Environment', () => {
         cy.findByTestId('FileSettings.AmazonS3PathPrefixinput').scrollIntoView().clear().type(amazonS3PathPrefix);
 
         // # Click Save button to save the settings
-        cy.get('#saveSetting').click().wait(TIMEOUTS.FIVE_SEC);
+        cy.get('#saveSetting').click().wait(TIMEOUTS.ONE_SEC);
 
         cy.get('#TestS3Connection').scrollIntoView().should('be.visible').within(() => {
             cy.findByText('Test Connection').should('be.visible').click().wait(TIMEOUTS.ONE_SEC);

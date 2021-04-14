@@ -27,7 +27,7 @@ describe('Messaging', () => {
                 testPrivateChannel = out.channel;
             });
 
-            cy.visitAndWait(`/${testTeam.name}/channels/town-square`);
+            cy.visit(`/${testTeam.name}/channels/town-square`);
         });
     });
 
@@ -81,10 +81,10 @@ describe('Messaging', () => {
                 cy.get(`#postMessageText_${clickedPostId}`).scrollIntoView().should('be.visible').and('have.text', `${message}-${maxMessageCount}`);
 
                 // * Check if the loading indicator is not visible
-                cy.get('.loading-screen').should('not.be.visible');
+                cy.get('.loading-screen').should('not.exist');
 
                 // * Check if the more messages text is not visible
-                cy.get('.more-messages-text').should('not.be.visible');
+                cy.get('.more-messages-text').should('not.exist');
             });
         });
     });

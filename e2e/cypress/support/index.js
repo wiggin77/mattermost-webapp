@@ -32,6 +32,8 @@ import './ui';
 import './ui_commands'; // soon to deprecate
 import './visual_commands';
 
+import {getDefaultConfig} from './api/system';
+
 Cypress.on('test:after:run', (test, runnable) => {
     // Only if the test is failed do we want to add
     // the additional context of the screenshot.
@@ -149,6 +151,12 @@ function printServerDetails() {
 }
 
 function sysadminSetup(user) {
+    if (Cypress.env('firstTest')) {
+        // Sends dummy call to update the config to server
+        // Without this, first call to `cy.apiUpdateConfig()` consistently getting time out error in CI against remote server.
+        cy.externalRequest({user, method: 'put', path: 'config', data: getDefaultConfig(), failOnStatusCode: false});
+    }
+
     if (!user.email_verified) {
         cy.apiVerifyUserEmailById(user.id);
     }
@@ -181,6 +189,9 @@ function sysadminSetup(user) {
             cy.apiPatchUserRoles(user.id, ['system_admin', 'system_manager', 'system_user']);
         }
     });
+
+    // # Disable plugins not included in prepackaged
+    cy.apiDisableNonPrepackagedPlugins();
 
     // # Check if default team is present; create if not found.
     cy.apiGetTeamsForUser().then(({teams}) => {
